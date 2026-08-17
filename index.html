@@ -40,7 +40,10 @@
     text-rendering:optimizeLegibility;
   }
   .wrap{max-width:1180px;margin:0 auto;}
-  .selector-card, .diagram-card, .inspector, .log-card, .controls, .summary-card, .legend{
+  @media(min-width:1400px){ .wrap{max-width:1560px;} }
+  @media(min-width:1700px){ .wrap{max-width:1880px;} }
+  @media(min-width:2000px){ .wrap{max-width:2200px;} }
+  .selector-card, .diagram-card, .inspector, .log-card, .controls, .summary-card, .collapse-panel{
     box-shadow:0 1px 2px rgba(0,0,0,0.18), 0 8px 24px -12px rgba(0,0,0,0.35);
   }
   html[data-theme="light"] .selector-card,
@@ -49,7 +52,7 @@
   html[data-theme="light"] .log-card,
   html[data-theme="light"] .controls,
   html[data-theme="light"] .summary-card,
-  html[data-theme="light"] .legend{
+  html[data-theme="light"] .collapse-panel{
     box-shadow:0 1px 2px rgba(20,30,45,0.05), 0 6px 18px -10px rgba(20,30,45,0.12);
   }
 
@@ -131,6 +134,47 @@
     font-family:var(--font-mono);font-size:10px;padding:2px 8px;border-radius:20px;
     background:var(--panel-2);border:1px solid var(--hair);color:var(--muted);white-space:nowrap;
   }
+  .playback-row{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    margin-top:12px;padding-top:12px;border-top:1px solid var(--hair);
+  }
+
+  /* ---------- Collapsible panels (fault injection, legend) ---------- */
+  .collapse-panel{
+    background:var(--panel);border:1px solid var(--hair);border-radius:10px;
+    margin-bottom:10px;overflow:hidden;
+  }
+  .collapse-panel summary{
+    list-style:none;cursor:pointer;padding:11px 14px;
+    font-family:var(--font-sans);font-size:12.5px;font-weight:700;color:var(--text);
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .collapse-panel summary::-webkit-details-marker{display:none;}
+  .collapse-panel summary::before{
+    content:'▸';display:inline-block;color:var(--muted);font-size:11px;
+    transition:transform .15s ease;width:10px;
+  }
+  .collapse-panel[open] summary::before{transform:rotate(90deg);}
+  .collapse-panel summary:hover{background:var(--panel-2);}
+  .collapse-hint{font-weight:400;color:var(--muted);font-size:11.5px;}
+  .fault-status{
+    margin-left:auto;font-family:var(--font-mono);font-size:11px;font-weight:700;
+    padding:4px 10px;border-radius:20px;background:var(--panel-2);border:1px solid var(--hair);
+    color:var(--dim);white-space:nowrap;
+  }
+  .fault-status.active{color:var(--media);border-color:var(--media-dim);background:rgba(242,184,75,0.1);}
+  .fault-clear{
+    font-family:var(--font-sans);font-size:11px;font-weight:700;padding:4px 10px;
+    border-radius:20px;background:rgba(240,101,77,0.1);border:1px solid var(--teardown);
+    color:var(--teardown);cursor:pointer;white-space:nowrap;touch-action:manipulation;
+    transition:all .15s ease;
+  }
+  .fault-clear:hover{background:var(--teardown);color:var(--bg);}
+  .fault-clear:active{transform:scale(0.95);}
+  .collapse-body{padding:0 14px 14px;border-top:1px solid var(--hair);padding-top:12px;}
+  .fault-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .fault-row + .fault-row{margin-top:10px;}
 
   /* ---------- Controls ---------- */
   .controls{
@@ -161,16 +205,12 @@
   /* ---------- Legend ---------- */
   .legend{
     display:flex;gap:16px;flex-wrap:wrap;align-items:center;
-    background:var(--panel);border:1px solid var(--hair);border-radius:10px;
-    padding:9px 12px;margin-bottom:14px;font-family:var(--font-mono);font-size:11px;color:var(--muted);
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
   }
   .legend .item{display:flex;align-items:center;gap:6px;}
   .legend .sw{width:9px;height:9px;border-radius:50%;display:inline-block;}
-  .legend details{margin-left:auto;}
-  .legend summary{cursor:pointer;color:var(--sig);font-weight:600;list-style:none;}
-  .legend summary::-webkit-details-marker{display:none;}
   .glossary-body{
-    margin-top:10px;padding-top:10px;border-top:1px solid var(--hair);
+    margin-top:12px;padding-top:12px;border-top:1px solid var(--hair);
     display:grid;grid-template-columns:1fr;gap:6px;font-family:var(--font-sans);
   }
   @media(min-width:640px){ .glossary-body{grid-template-columns:1fr 1fr;} }
@@ -179,19 +219,46 @@
 
   /* ---------- Main layout ---------- */
   .main{display:grid;grid-template-columns:1fr;gap:14px;}
-  @media(min-width:900px){ .main{grid-template-columns: 1.5fr 1fr;align-items:start;} }
+  @media(min-width:900px){ .main{grid-template-columns: 1.5fr 10px 1fr;gap:0;align-items:stretch;} }
+  @media(min-width:1400px){ .main{grid-template-columns: 1.8fr 10px 1fr;} }
+  .col-splitter{display:none;}
+  @media(min-width:900px){
+    .col-splitter{
+      display:flex;align-items:center;justify-content:center;cursor:col-resize;
+      touch-action:none;position:relative;
+    }
+    .col-splitter::after{
+      content:'';width:3px;height:48px;border-radius:3px;background:var(--hair);
+      transition:background .15s ease;
+    }
+    .col-splitter:hover::after, .col-splitter.dragging::after{background:var(--sig);}
+  }
 
-  .diagram-card{background:var(--panel);border:1px solid var(--hair);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+  /* ---------- Drag-to-resize handles (full-width, sit on the box border) ---------- */
+  .resize-h{
+    height:14px;flex:0 0 auto;cursor:ns-resize;touch-action:none;
+    display:flex;align-items:center;justify-content:center;
+    border-top:1px solid var(--hair);background:var(--panel-2);
+  }
+  .resize-h span{
+    width:36px;height:4px;border-radius:3px;background:var(--hair);transition:background .15s ease;
+  }
+  .resize-h:hover span, .resize-h.dragging span{background:var(--sig);}
+  body.resizing-v, body.resizing-v *{cursor:ns-resize !important;user-select:none !important;}
+  body.resizing-h, body.resizing-h *{cursor:col-resize !important;user-select:none !important;}
+
+  .diagram-card{background:var(--panel);border:1px solid var(--hair);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0;}
   .diagram-hscroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
   .diagram-inner{width:100%;}
   .col-headers{display:flex;border-bottom:1px solid var(--hair);background:var(--panel-2);}
   .col-head{flex:1;padding:10px 6px;text-align:center;border-right:1px solid var(--hair);min-width:118px;}
   .col-head:last-child{border-right:none;}
+  .col-head .ep-icon{font-size:20px;line-height:1;margin-bottom:3px;filter:saturate(1.1);}
   .col-head .id{font-family:var(--font-mono);font-weight:700;font-size:12.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .col-head .ip{font-family:var(--font-mono);font-size:9.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   .diagram-scroll{
-    position:relative;height:430px;overflow-y:auto;overflow-x:hidden;
+    position:relative;height:430px;min-height:220px;max-height:80vh;overflow-y:auto;overflow-x:hidden;
     background-image:repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--grid) 40px);
   }
   .lifelines{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none;}
@@ -229,7 +296,7 @@
   .code-picker select:focus{outline:none;border-color:var(--sig);}
 
   /* ---------- Inspector ---------- */
-  .inspector{background:var(--panel);border:1px solid var(--hair);border-radius:12px;display:flex;flex-direction:column;min-height:430px;}
+  .inspector{background:var(--panel);border:1px solid var(--hair);border-radius:12px;display:flex;flex-direction:column;min-height:430px;min-width:0;}
   .insp-head{padding:10px 14px;border-bottom:1px solid var(--hair);display:flex;align-items:center;justify-content:space-between;background:var(--panel-2);}
   .insp-head .title{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
   .insp-head .msg-tag{font-family:var(--font-mono);font-weight:700;font-size:12.5px;padding:3px 9px;border-radius:5px;}
@@ -241,7 +308,7 @@
   }
   .itab:hover{color:var(--text);}
   .itab.active{color:var(--sig);border-bottom-color:var(--sig);}
-  .insp-body{padding:14px;overflow-y:auto;flex:1;font-size:13px;line-height:1.6;}
+  .insp-body{padding:14px;overflow-y:auto;flex:1;font-size:13px;line-height:1.6;min-height:160px;max-height:80vh;}
   .itab-panel{display:none;}
   .itab-panel.active{display:block;}
   .insp-body .empty{color:var(--dim);font-size:12.5px;padding-top:40px;text-align:center;font-family:var(--font-sans);}
@@ -346,6 +413,16 @@
   .summary-stat{background:var(--panel-2);border:1px solid var(--hair);border-radius:8px;padding:10px 12px;}
   .summary-stat .label{font-family:var(--font-mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
   .summary-stat .val{font-size:14px;color:var(--text);font-weight:700;margin-top:3px;font-family:var(--font-mono);}
+  .summary-reason{
+    margin-top:12px;padding:12px 14px;border-radius:8px;
+    background:var(--panel-2);border-left:3px solid var(--teardown);
+  }
+  .summary-reason.soft{border-left-color:var(--media);}
+  .summary-reason .sr-label{font-family:var(--font-sans);font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .summary-reason .sr-label b{color:var(--sig);}
+  .summary-reason .sr-text{font-size:13px;color:var(--text);line-height:1.55;}
+  .summary-reason .sr-fix{margin-top:9px;padding-top:9px;border-top:1px solid var(--hair);font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .summary-reason .sr-fix b{color:var(--media);}
   .summary-close{
     font-family:var(--font-sans);font-size:11.5px;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;
   }
@@ -353,7 +430,7 @@
 
   .log-head{padding:10px 14px;border-bottom:1px solid var(--hair);font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;background:var(--panel-2);}
   .log-cols{display:grid;grid-template-columns:66px 30px 1fr 120px;gap:10px;padding:6px 14px;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--hair);}
-  .log-body{max-height:280px;overflow-y:auto;}
+  .log-body{height:280px;max-height:70vh;overflow-y:auto;min-height:120px;}
   .log-row{padding:7px 14px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--grid);cursor:pointer;color:var(--muted);}
   .log-row:hover{background:var(--panel-2);}
   .log-row.active{background:rgba(94,234,212,0.07);}
@@ -421,34 +498,54 @@
       <span class="calltype-hint" id="callTypeHint"></span>
     </div>
     <div class="sel-meta" id="selMeta"></div>
+
+    <div class="playback-row">
+      <button class="btn primary" id="playBtn">▶ &nbsp;Play</button>
+      <button class="btn stop" id="stopBtn">■ &nbsp;Stop</button>
+      <button class="btn" id="restartBtn">⟲ &nbsp;Restart</button>
+      <div class="clock">t&#43; <b id="clockVal">00:00.0</b></div>
+      <div class="speed-group" id="speedGroup"></div>
+    </div>
   </div>
 
-  <div class="controls">
-    <button class="btn primary" id="playBtn">▶ &nbsp;Play</button>
-    <button class="btn stop" id="stopBtn">■ &nbsp;Stop</button>
-    <button class="btn" id="restartBtn">⟲ &nbsp;Restart</button>
-    <div class="clock">t&#43; <b id="clockVal">00:00.0</b></div>
-    <div class="speed-group" id="speedGroup"></div>
-  </div>
+  <details class="collapse-panel">
+    <summary>🧪 Fault Injection <span class="collapse-hint">— overlay a media or signaling problem on any simulation</span><span class="fault-status" id="faultStatus">No faults active</span><button class="fault-clear" id="clearFaultsBtn" title="Clear all active faults" style="display:none;">✕ Clear</button></summary>
+    <div class="collapse-body">
+      <div class="fault-row">
+        <label class="fault-label" for="faultSelect">Inject fault on media:</label>
+        <select id="faultSelect" class="fault-select">
+          <option value="none">None — play normally</option>
+          <option value="oneway">One-way audio</option>
+          <option value="noaudio">No audio (RTP blackhole)</option>
+          <option value="degraded">Packet loss / jitter</option>
+        </select>
+      </div>
+      <div class="fault-row">
+        <label class="fault-label" for="signalFaultSelect">Inject fault on signaling:</label>
+        <select id="signalFaultSelect" class="fault-select">
+          <option value="none">None — play normally</option>
+          <option value="busy">Force 486 Busy Here</option>
+          <option value="notfound">Force 404 Not Found</option>
+          <option value="unavailable">Force 480 Temporarily Unavailable</option>
+          <option value="timeout">Force 408 Request Timeout</option>
+        </select>
+      </div>
+      <div class="fault-row">
+        <button class="mini-btn" id="clearFaultsBtn2" title="Clear all active faults" style="display:none;">✕ Clear all faults</button>
+      </div>
+    </div>
+  </details>
 
-  <div class="controls">
-    <label class="fault-label" for="faultSelect">🧪 Inject fault on media:</label>
-    <select id="faultSelect" class="fault-select">
-      <option value="none">None — play normally</option>
-      <option value="oneway">One-way audio</option>
-      <option value="noaudio">No audio (RTP blackhole)</option>
-      <option value="degraded">Packet loss / jitter</option>
-    </select>
-  </div>
-
-  <div class="legend">
-    <div class="item"><span class="sw" style="background:var(--sig)"></span>Signaling (SIP)</div>
-    <div class="item"><span class="sw" style="background:var(--media)"></span>Media (RTP/RTCP)</div>
-    <div class="item"><span class="sw" style="background:var(--teardown)"></span>Teardown</div>
-    <div class="item"><span class="sw" style="background:var(--muted)"></span>Timer / wait</div>
-    <div class="item"><span class="sdp-chip" style="margin-left:0;">SDP</span>&nbsp;Message carries an SDP body</div>
-    <details>
-      <summary>? Glossary</summary>
+  <details class="collapse-panel">
+    <summary>🎨 Legend &amp; Glossary</summary>
+    <div class="collapse-body">
+      <div class="legend">
+        <div class="item"><span class="sw" style="background:var(--sig)"></span>Signaling (SIP)</div>
+        <div class="item"><span class="sw" style="background:var(--media)"></span>Media (RTP/RTCP)</div>
+        <div class="item"><span class="sw" style="background:var(--teardown)"></span>Teardown</div>
+        <div class="item"><span class="sw" style="background:var(--muted)"></span>Timer / wait</div>
+        <div class="item"><span class="sdp-chip" style="margin-left:0;">SDP</span>&nbsp;Message carries an SDP body</div>
+      </div>
       <div class="glossary-body">
         <div><b>SIP</b> — Session Initiation Protocol; sets up, changes, and ends calls.</div>
         <div><b>SDP</b> — Session Description Protocol; describes the audio/video being offered.</div>
@@ -461,21 +558,24 @@
         <div><b>100rel / PRACK</b> — makes provisional responses (like ringing) reliable.</div>
         <div><b>Diversion header</b> — tells the receiving phone a call was forwarded, and why.</div>
       </div>
-    </details>
-  </div>
+    </div>
+  </details>
 
-  <div class="main">
+  <div class="main" id="mainGrid">
     <div class="diagram-card">
       <div class="diagram-hscroll" id="diagramHscroll">
         <div class="diagram-inner" id="diagramInner">
           <div class="col-headers" id="colHeaders"></div>
           <div class="diagram-scroll" id="scrollArea">
             <div class="lifelines" id="lifelines"></div>
-            <svg class="evtsvg" id="evtSvg" width="100%"></svg>
+            <svg class="evtsvg" id="evtSvg" width="100%" preserveAspectRatio="none"></svg>
           </div>
         </div>
       </div>
+      <div class="resize-h" id="resizeDiagram" title="Drag to resize"><span></span></div>
     </div>
+
+    <div class="col-splitter" id="colSplitter" title="Drag to resize"></div>
 
     <div class="inspector">
       <div class="insp-head">
@@ -489,6 +589,7 @@
         <button class="itab" data-tab="debug">Debug</button>
       </div>
       <div class="insp-body" id="inspBody"><div class="empty">Press Play — the first packet detail will appear here.</div></div>
+      <div class="resize-h" id="resizeInspector" title="Drag to resize"><span></span></div>
     </div>
   </div>
 
@@ -504,6 +605,7 @@
     </div>
     <div class="log-cols"><span>TIME</span><span>#</span><span>MESSAGE</span><span style="text-align:right">ROUTE</span></div>
     <div class="log-body" id="logBody"></div>
+    <div class="resize-h" id="resizeLog" title="Drag to resize"><span></span></div>
   </div>
 
   <footer>All addressing shown is illustrative (RFC 3261 / RFC 4566 / RFC 3550 / RFC 3515 / RFC 4028 conventions).</footer>
@@ -514,12 +616,13 @@
    ENDPOINTS
 ========================================================= */
 const ENDPOINTS = {
-  A: { label:'User A', ip:'192.168.1.100', port:'40000' },
-  B: { label:'User B', ip:'192.168.1.200', port:'50000' },
-  C: { label:'User C', ip:'192.168.1.210', port:'55000' },
-  P: { label:'PBX / SBC / Proxy', ip:'10.0.0.1', port:'5060' },
-  F: { label:'Conference Focus', ip:'10.0.0.50', port:'5060' },
-  X: { label:'Carrier / SIP Trunk', ip:'203.0.113.10', port:'5060' }
+  A: { label:'User A', ip:'192.168.1.100', port:'40000', icon:'☎️' },
+  B: { label:'User B', ip:'192.168.1.200', port:'50000', icon:'☎️' },
+  C: { label:'User C', ip:'192.168.1.210', port:'55000', icon:'☎️' },
+  P: { label:'PBX / SBC / Proxy', ip:'10.0.0.1', port:'5060', icon:'🖥️' },
+  F: { label:'Conference Focus', ip:'10.0.0.50', port:'5060', icon:'🎛️' },
+  X: { label:'Carrier / SIP Trunk', ip:'203.0.113.10', port:'5060', icon:'🌐' },
+  P2: { label:'Proxy 2 (misrouted)', ip:'10.0.0.2', port:'5060', icon:'🖥️' }
 };
 
 const PLAIN = {
@@ -1103,6 +1206,193 @@ const SCENARIO_TEMPLATES = {
     sig('B>P','200 OK',{code:200, sdp:{raw:['(answer SDP omitted for clarity)']}}),
     sig('P>A','200 OK',{code:200}),
     sig('A>P','ACK',{})
+  ]},
+
+  trunkreg:{ name:'Carrier Trunk Registration', category:'carrier', endpoints:['P','X'], steps:[
+    sig('P>X','REGISTER',{firstRequest:true, extraHeaders:['Contact: <sip:pbx@10.0.0.1:5060>'], plain:'The PBX registers itself with the carrier so the carrier knows where to route inbound calls for this trunk.'}),
+    sig('X>P','401 Unauthorized',{code:401, extraHeaders:['WWW-Authenticate: Digest realm="carrier.net", nonce="…"'], note:'The carrier challenges the registration before accepting it.', plain:'The carrier will not accept the trunk registration yet — it wants proof of identity first.'}),
+    sig('P>X','REGISTER',{label:'REGISTER (with credentials)', extraHeaders:['Authorization: Digest username="trunk-8675309", realm="carrier.net", response="…"'], plain:'The PBX retries registration, this time including the trunk’s credentials.'}),
+    sig('X>P','200 OK',{code:200, extraHeaders:['Expires: 3600'], note:'The carrier now knows this PBX is online and where to send inbound calls.', plain:'Registration succeeds — the trunk is active for both inbound and outbound calls.'})
+  ]},
+
+  carriercodec:{ name:'Carrier Codec Restriction', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 111 9 0', codecs:['opus/48000/2 (111)','G.722/8000 (9)','PCMU/8000 (0)']}, plain:'User A’s call is offered internally with the PBX’s full codec list, including HD options.'}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{sdp:{c:'IN IP4 10.0.0.1', m:'audio 61000 RTP/AVP 0', codecs:['PCMU/8000 (0)']}, note:'This carrier’s trunk profile only allows G.711 — the PBX narrows the offer to match the trunk contract before sending it onward.', plain:'Even though A could support HD voice, the PBX restricts the offer down to what this specific carrier allows.'}),
+    sig('X>B','INVITE',{}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 0', codecs:['PCMU/8000 (0) — accepted']}}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200, note:'The call ends up narrowband even though User A’s device supports wideband — the trunk’s codec policy is the limiting factor.'}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — PCMU (carrier-restricted)',12000,{note:'Every call over this trunk is capped at G.711 quality, regardless of what the two endpoints could otherwise negotiate.'}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  extonewayaudio:{ name:'External One-Way Audio (Carrier Relay)', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 0', codecs:['PCMU/8000 (0)']}}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{}),
+    sig('X>B','INVITE',{}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 0', codecs:['PCMU/8000 (0) — accepted']}}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — one-way only',12000,{oneway:'B>A', note:'The carrier’s SBC anchors media and rewrites the SDP connection address, but its leg back toward the PBX is misconfigured — audio flows from A to B but never returns.', plain:'Signaling completed cleanly across the trunk, and one direction of audio works, but the carrier’s media relay never sends audio back toward User A.', fix:'Check the carrier’s SBC media relay / far-end NAT configuration for this trunk, confirm the return RTP path is open, and verify the carrier’s SDP rewrite isn’t pointing at a stale address.', rootCause:['The call connects cleanly end-to-end across the trunk','User A’s audio reaches User B without any problem','The carrier’s media relay fails to forward B’s audio back to A','Result: A hears silence while B hears A normally']}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  extnoaudio:{ name:'External No Audio (Carrier-Side Failure)', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 0', codecs:['PCMU/8000 (0)']}}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{}),
+    sig('X>B','INVITE',{}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 0', codecs:['PCMU/8000 (0) — accepted']}}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — no packets arriving',10000,{noaudio:true, note:'Signaling completed across the trunk and both sides agreed on a codec, but the carrier’s media relay never actually establishes — commonly because the RTP port range for this trunk isn’t open on the carrier’s side, or the carrier’s SBC failed to anchor the session.', plain:'The call shows as connected on both phones, but there is total silence — no audio in either direction.', fix:'Open a support case with the carrier and provide the Call-ID and timestamp, confirm your side’s RTP port range is correctly published in the trunk’s SIP profile, and check whether other calls over the same trunk are affected (points to a carrier-wide issue) or just this one (points to a per-call anomaly).', rootCause:['Signaling (INVITE through 200 OK) completes normally across the trunk','A codec is successfully negotiated in the SDP','The carrier’s media relay never actually forwards any RTP packets','Result: the call is “connected” but completely silent both ways']}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  garbledaudio:{ name:'Garbled Audio (Tandem Transcoding)', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 9', codecs:['G.722/8000 (9) — wideband']}, plain:'User A’s phone offers wideband G.722 audio.'}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{sdp:{c:'IN IP4 10.0.0.1', m:'audio 61000 RTP/AVP 18', codecs:['G.729/8000 (18)']}, note:'This carrier’s trunk profile prefers compressed G.729 to save bandwidth, so the PBX transcodes A’s wideband audio down to G.729 before sending it out.', plain:'The first transcoding pass happens here: G.722 is converted down to G.729.'}),
+    sig('X>B','INVITE',{}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 18', codecs:['G.729/8000 (18) — accepted']}}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200, note:'The far end’s own PBX will very likely transcode this G.729 audio again to reach B’s actual handset — a second, cascaded transcoding pass that this simulation cannot see directly.'}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — tandem-transcoded audio',14000,{transcodeArtifact:true, note:'Notice that jitter, loss, and RTT below all look perfectly healthy — that’s the diagnostic signature of a transcoding problem rather than a network problem. Each codec conversion pass discards some audio information; cascaded through two or more passes, speech comes out muffled or slightly robotic even with a flawless network.', plain:'The call sounds muffled or garbled, but stays smooth and continuous — nothing is cutting in and out. That combination is the tell: this is a codec/transcoding issue, not packet loss.', fix:'Where possible, negotiate a shared codec end-to-end so transcoding only happens once (or not at all), avoid low-bitrate codecs like G.729 for calls where quality matters, and ask the carrier whether codec pass-through is available on this trunk.', rootCause:['User A’s wideband G.722 audio is transcoded down to G.729 at the PBX, to match the trunk profile','The far end likely transcodes G.729 again to reach User B’s handset','Each transcoding pass discards audio information that can’t be recovered','Result: garbled, muffled-sounding audio with no packet loss at all']}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  echoscenario:{ name:'Echo (PSTN Gateway Hybrid Coupling)', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 0', codecs:['PCMU/8000 (0)']}}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{}),
+    sig('X>B','INVITE',{note:'User B is a traditional PSTN phone reached through the carrier’s TDM-to-IP gateway.'}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 0', codecs:['PCMU/8000 (0) — accepted']}}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — clean, but echo reported',13000,{note:'This is deliberately different from every other audio issue in this tool: echo is an acoustic/analog phenomenon, not a packet-level one. It happens at the carrier’s TDM-to-IP gateway, where a 2-wire to 4-wire “hybrid” conversion imperfectly isolates the send and receive paths, leaking a delayed copy of the far end’s own voice back to them.', plain:'User A hears their own voice echoed back a fraction of a second later. RTP/RTCP statistics for this call will look completely normal — there is nothing to see in a packet capture, because the leak happens in the analog/TDM domain, not the IP network.', fix:'This is diagnosed and fixed at the gateway, not in SIP: check the PSTN gateway’s or carrier’s echo canceller (G.168) is enabled and correctly trained, review Echo Return Loss (ERL) on the affected trunk, and if it’s consistent on one route, escalate to the carrier with call timestamps — it usually points to a specific gateway or trunk group.'}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  hdvoice:{ name:'HD Voice (Wideband Across Trunk)', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 111', codecs:['opus/48000/2 (111) — wideband']}, plain:'User A’s phone offers Opus, a modern wideband codec.'}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{note:'Unlike a restrictive trunk, this carrier’s profile allows wideband codecs straight through, unmodified.'}),
+    sig('X>B','INVITE',{}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 111', codecs:['opus/48000/2 (111) — accepted']}, plain:'User B’s device also supports Opus, so the call negotiates full HD voice end-to-end across the trunk.'}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — Opus wideband (HD)',14000,{note:'No transcoding, no restriction — full-bandwidth audio flows all the way from A to B, giving noticeably clearer, more natural-sounding speech than a narrowband G.711 call.'}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  anchoredmedia:{ name:'Anchored Media (Carrier Relays RTP)', category:'carrier', endpoints:['A','P','X','B'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 0', codecs:['PCMU/8000 (0)']}}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>X','INVITE',{}),
+    sig('X>B','INVITE',{}),
+    sig('B>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>X','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 0', codecs:['PCMU/8000 (0) — accepted']}}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','P'],['P','X'],['X','B']],'RTP — anchored through PBX and carrier',13000,{mixAt:'X', note:'Unlike most calls in this tool, media here does not flow directly between A and B — every packet is relayed through the PBX and the carrier’s SBC. This costs a little extra latency and server capacity, but enables call recording, transcoding, and hides each side’s real IP address from the other.', plain:'Both the PBX and the carrier stay in the audio path for the whole call, rather than stepping aside once signaling is done.'}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  callforking:{ name:'Parallel Call Forking', category:'multiparty', endpoints:['A','P','B','C'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, plain:'User A calls a hunt-group number that rings every member at once.'}),
+    sig('P>P','Fork Lookup',{code:'', method:'Fork Lookup', label:'⚙ Hunt group lookup', note:'The proxy looks up the hunt group and forks the INVITE to every registered member simultaneously.', plain:'Instead of trying one phone at a time, the server rings all of them in parallel.'}),
+    sig('P>B','INVITE',{}),
+    sig('P>C','INVITE',{callId:'fork-c@192.168.1.100', firstRequest:true}),
+    sig('B>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('C>P','180 Ringing',{code:180, callId:'fork-c@192.168.1.100'}),
+    sig('B>P','200 OK',{code:200, plain:'User B answers first — this fork wins the race.'}),
+    sig('P>A','200 OK',{code:200}),
+    sig('P>C','CANCEL',{callId:'fork-c@192.168.1.100', note:'Now that B has answered, the proxy cancels the still-ringing fork to C — a call can only be answered once.'}),
+    sig('C>P','200 OK',{code:200, callId:'fork-c@192.168.1.100', cseqOverride:{num:1,method:'CANCEL'}, note:'Response to the CANCEL.'}),
+    sig('C>P','487 Request Terminated',{code:487, callId:'fork-c@192.168.1.100', cseqOverride:{num:1,method:'INVITE'}, plain:'C’s leg is formally closed out since it lost the race.'}),
+    sig('P>C','ACK',{callId:'fork-c@192.168.1.100'}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — A ⇄ B',10000,{}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  extdidtransfer:{ name:'Blind Transfer to External DID', category:'transfer', endpoints:['A','P','X','B','C'], steps:[
+    sig('A>P','INVITE',{firstRequest:true}),
+    sig('P>P','100 Trying',{code:100}),
+    sig('P>B','INVITE',{}),
+    sig('B>P','180 Ringing',{code:180}),
+    sig('P>A','180 Ringing',{code:180}),
+    sig('B>P','200 OK',{code:200}),
+    sig('P>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — A ⇄ B',6000,{}),
+    sig('A>B','REFER',{direct:true, extraHeaders:['Refer-To: <sip:+13035551234@carrier.net>'], plain:'User A asks User B to call an outside phone number — a PSTN destination reached through the carrier, not another extension on this system.'}),
+    sig('B>A','202 Accepted',{code:202, direct:true}),
+    sig('B>P','INVITE',{firstRequest:true, note:'Since the transfer target is external, this new call must route out through the PBX and the carrier trunk, just like any other outbound call.'}),
+    sig('P>X','INVITE',{}),
+    sig('X>C','INVITE',{}),
+    sig('C>X','180 Ringing',{code:180}),
+    sig('X>P','180 Ringing',{code:180}),
+    sig('P>B','180 Ringing',{code:180}),
+    sig('C>X','200 OK',{code:200}),
+    sig('X>P','200 OK',{code:200}),
+    sig('P>B','200 OK',{code:200}),
+    sig('B>P','ACK',{}),
+    sig('B>A','NOTIFY',{direct:true, extraHeaders:['Event: refer','Content-Type: message/sipfrag'], body:'SIP/2.0 200 OK', plain:'User B reports back that the external number answered.'}),
+    sig('A>B','200 OK',{code:200, direct:true}),
+    media([['B','C']],'RTP — B ⇄ external DID',9000,{}),
+    sig('A>B','BYE',{direct:true, teardown:true, plain:'User A leaves the call — the transfer is complete.'}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
+  ]},
+
+  toomanyhops:{ name:'483 Too Many Hops (Routing Loop)', category:'errors', endpoints:['A','P','P2'], steps:[
+    sig('A>P','INVITE',{firstRequest:true, extraHeaders:['Max-Forwards: 5 (lowered here to illustrate the loop quickly — normally 70)'], plain:'User A calls User B. To make the loop visible in a handful of hops instead of dozens, this example starts with Max-Forwards: 5 instead of the usual 70.'}),
+    sig('P>P2','INVITE',{extraHeaders:['Max-Forwards: 4'], note:'Proxy 1 forwards toward what it believes is the next hop.'}),
+    sig('P2>P','INVITE',{extraHeaders:['Max-Forwards: 3'], note:'Proxy 2’s routing table incorrectly points back to Proxy 1 for this same destination — the loop has begun.'}),
+    sig('P>P2','INVITE',{extraHeaders:['Max-Forwards: 2']}),
+    sig('P2>P','INVITE',{extraHeaders:['Max-Forwards: 1']}),
+    sig('P>P2','INVITE',{extraHeaders:['Max-Forwards: 0'], note:'Max-Forwards has now reached zero.'}),
+    sig('P2>P','483 Too Many Hops',{code:483, note:'Per RFC 3261, a proxy that would decrement Max-Forwards below zero must reject the request instead of forwarding it again.', plain:'Rather than forward the request once more and risk looping forever, this proxy gives up and reports the failure back the way it came.', fix:'Check both proxies’ routing / dial-plan tables for this destination — one of them has a rule that sends the call right back where it came from. In a real packet capture, trace the Via header chain to see exactly which hop repeats.', rootCause:['Proxy 2’s routing table sends this destination to Proxy 1','Proxy 1’s routing table sends the same destination to Proxy 2','Each hop decrements Max-Forwards, which is the only thing stopping an infinite loop','Once Max-Forwards would go below zero, the proxy must reject rather than loop forever']}),
+    sig('P>A','483 Too Many Hops',{code:483, note:'Relayed back to the original caller.'}),
+    sig('A>P','ACK',{})
   ]}
 };
 
@@ -1167,12 +1457,65 @@ function applyCallType(templateSteps, templateEndpoints, mode){
   });
   return { steps: propagateRelayedSdp(newSteps), endpoints: newEndpoints };
 }
+
+/* =========================================================
+   SIGNALING FAULT INJECTION
+   Replaces the first successful (2xx) final response to the
+   scenario's opening INVITE with a chosen failure, and drops
+   everything that depended on the call having succeeded
+   (media, BYE, later re-INVITEs) — since the call never
+   actually connects. Structural, not cosmetic: this changes
+   what happens, not just what a tooltip says.
+========================================================= */
+const SIGNAL_FAULTS = {
+  busy:       { code:486, method:'486 Busy Here' },
+  notfound:   { code:404, method:'404 Not Found' },
+  unavailable:{ code:480, method:'480 Temporarily Unavailable' },
+  timeout:    { code:408, method:'408 Request Timeout' }
+};
+function applySignalingFault(templateSteps, mode){
+  const fault = SIGNAL_FAULTS[mode];
+  if(!fault) return templateSteps;
+  let successIdx = -1;
+  for(let i=0;i<templateSteps.length;i++){
+    const s = templateSteps[i];
+    if(s.kind==='signal' && s.code>=200 && s.code<300 && !s.callId){ successIdx = i; break; }
+  }
+  if(successIdx===-1) return templateSteps;
+  let blockEnd = successIdx;
+  while(blockEnd+1<templateSteps.length && templateSteps[blockEnd+1].kind==='signal' &&
+        templateSteps[blockEnd+1].code===templateSteps[successIdx].code && !templateSteps[blockEnd+1].callId){
+    blockEnd++;
+  }
+  let ackIdx = -1;
+  for(let i=blockEnd+1;i<templateSteps.length;i++){
+    if(templateSteps[i].kind==='signal' && templateSteps[i].method==='ACK' && !templateSteps[i].callId){ ackIdx = i; break; }
+    if(templateSteps[i].kind==='signal' && !templateSteps[i].code && templateSteps[i].method!=='ACK') break;
+  }
+  const out = templateSteps.slice(0, successIdx).map(s=>Object.assign({}, s));
+  for(let i=successIdx;i<=blockEnd;i++){
+    const orig = templateSteps[i];
+    const isOrigin = i===successIdx;
+    out.push(Object.assign({}, orig, {
+      code: fault.code, method: fault.method,
+      sdp: undefined, extraHeaders: undefined,
+      note: isOrigin ? 'Injected signaling fault — this call would normally succeed at this point.' : 'Relayed back.',
+      plain: isOrigin ? 'A signaling fault was injected for this playthrough: instead of succeeding, the call fails here, and never reaches the media stage.' : undefined,
+      fix: undefined, rootCause: undefined
+    }));
+  }
+  if(ackIdx>-1) out.push(Object.assign({}, templateSteps[ackIdx]));
+  return out;
+}
+
 const SCENARIOS = {};
 Object.keys(SCENARIO_TEMPLATES).forEach(k=>{ SCENARIOS[k] = Object.assign({}, SCENARIO_TEMPLATES[k]); });
+let signalFaultMode = 'none';
 function rebuildScenario(key){
   const tpl = SCENARIO_TEMPLATES[key];
   if(tpl.isExplorer) return;
-  const {steps, endpoints} = applyCallType(tpl.steps, tpl.endpoints, callType);
+  let {steps, endpoints} = applyCallType(tpl.steps, tpl.endpoints, callType);
+  steps = applySignalingFault(steps, signalFaultMode);
   SCENARIOS[key].steps = steps;
   SCENARIOS[key].endpoints = endpoints;
 }
@@ -1189,6 +1532,7 @@ const CATEGORIES = [
   {id:'faxdtmf', label:'Fax & DTMF'},
   {id:'sdp', label:'SDP & Codecs'},
   {id:'audioissues', label:'Audio & RTP Issues'},
+  {id:'carrier', label:'Carrier & Trunking'},
   {id:'errors', label:'Signaling & Errors'},
   {id:'methods', label:'Other SIP Methods'},
   {id:'reference', label:'Response Code Lookup'}
@@ -1389,12 +1733,13 @@ const codeSelect = document.getElementById('codeSelect');
 const sdpPicker = document.getElementById('sdpPicker');
 const sdpSelect = document.getElementById('sdpSelect');
 const faultSelect = document.getElementById('faultSelect');
+const signalFaultSelect = document.getElementById('signalFaultSelect');
 const summaryCard = document.getElementById('summaryCard');
 const exportLogBtn = document.getElementById('exportLogBtn');
 
 const CATEGORY_ICON = {
   core:'📞', transfer:'🔀', forwarding:'↪️', multiparty:'👥',
-  faxdtmf:'📠', sdp:'🧩', audioissues:'🎧', errors:'⚠️', methods:'⚙️', reference:'📖'
+  faxdtmf:'📠', sdp:'🧩', audioissues:'🎧', carrier:'🛰️', errors:'⚠️', methods:'⚙️', reference:'📖'
 };
 
 /* =========================================================
@@ -1458,6 +1803,46 @@ function setCallType(mode){
   computeLayout();
   resetState();
 }
+function setSignalFault(mode){
+  if(signalFaultMode===mode) return;
+  signalFaultMode = mode;
+  const tpl = SCENARIO_TEMPLATES[scenarioKey];
+  if(!tpl.isExplorer) rebuildScenario(scenarioKey);
+  buildColumns();
+  computeLayout();
+  resetState();
+  updateFaultStatus();
+}
+function updateFaultStatus(){
+  const el = document.getElementById('faultStatus');
+  const clearBtn = document.getElementById('clearFaultsBtn');
+  const clearBtn2 = document.getElementById('clearFaultsBtn2');
+  if(!el) return;
+  const parts = [];
+  if(faultMode!=='none') parts.push('Media: '+faultSelect.options[faultSelect.selectedIndex].text);
+  if(signalFaultMode!=='none') parts.push('Signaling: '+signalFaultSelect.options[signalFaultSelect.selectedIndex].text);
+  const anyActive = parts.length>0;
+  if(anyActive){
+    el.textContent = parts.join(' · ');
+    el.classList.add('active');
+  } else {
+    el.textContent = 'No faults active';
+    el.classList.remove('active');
+  }
+  if(clearBtn) clearBtn.style.display = anyActive ? '' : 'none';
+  if(clearBtn2) clearBtn2.style.display = anyActive ? '' : 'none';
+}
+function clearAllFaults(){
+  faultMode = 'none';
+  faultSelect.value = 'none';
+  if(signalFaultMode!=='none'){
+    signalFaultSelect.value = 'none';
+    setSignalFault('none');
+  } else {
+    if(lastSelectedStep>=0) selectStep(lastSelectedStep);
+    updateFaultStatus();
+  }
+}
 function buildSpeedGroup(){
   speedGroup.innerHTML = '';
   [0.5,1,2].forEach(s=>{
@@ -1487,7 +1872,7 @@ function buildColumns(){
     const ep = ENDPOINTS[id];
     const head = document.createElement('div');
     head.className = 'col-head';
-    head.innerHTML = `<div class="id">${ep.label}</div><div class="ip">${ep.ip}${ep.port?':'+ep.port:''}</div>`;
+    head.innerHTML = `<div class="ep-icon">${ep.icon||'📡'}</div><div class="id">${ep.label}</div><div class="ip">${ep.ip}${ep.port?':'+ep.port:''}</div>`;
     colHeadersEl.appendChild(head);
 
     const line = document.createElement('div');
@@ -1517,6 +1902,7 @@ function computeLayout(){
   });
   const totalH = y + 30;
   svg.setAttribute('height', totalH);
+  svg.style.height = totalH + 'px';
   svg.setAttribute('viewBox', `0 0 1000 ${totalH}`);
   lifelinesEl.style.height = totalH+'px';
 }
@@ -1556,6 +1942,7 @@ function resetState(){
   playBtn.innerHTML = '▶ &nbsp;Play';
   scrollArea.scrollTop = 0;
   diagramHscroll.scrollLeft = 0;
+  requestAnimationFrame(()=>{ scrollArea.scrollTop = 0; diagramHscroll.scrollLeft = 0; });
 }
 function switchScenario(key){
   scenarioKey = key;
@@ -2020,13 +2407,28 @@ function showCallSummary(){
   const mediaSteps = steps.filter(s=>s.kind==='media');
   let mediaStatus = 'No media in this flow';
   if(mediaSteps.length){
-    const bad = mediaSteps.some(s=>{ const es = effectiveMediaStep(s); return es.noaudio||es.oneway||es.degraded; });
+    const bad = mediaSteps.some(s=>{ const es = effectiveMediaStep(s); return es.noaudio||es.oneway||es.degraded||es.transcodeArtifact; });
     mediaStatus = bad ? '⚠ Issue detected' : '✓ OK';
   }
 
   const issue = firstIssueIndex(steps);
   const resultCls = issue.severity==='hard' ? 'fail' : (issue.severity==='soft' ? 'warn' : 'pass');
   const resultWord = issue.severity==='hard' ? 'FAIL' : (issue.severity==='soft' ? 'PASS ⚠' : 'PASS');
+
+  let reasonHtml = '';
+  if(issue.index>=0){
+    const failStep = effectiveMediaStep(steps[issue.index]);
+    const isHard = issue.severity==='hard';
+    const heading = isHard ? '❌ Why this call failed' : '⚠️ Why there was an issue';
+    const label = displayLabel(steps[issue.index]);
+    const reasonText = failStep.plain || plainFor(steps[issue.index]);
+    reasonHtml = `
+    <div class="summary-reason ${isHard?'hard':'soft'}">
+      <div class="sr-label">${heading} — <b>${label}</b> (step #${issue.index+1})</div>
+      <div class="sr-text">${reasonText}</div>
+      ${failStep.fix ? `<div class="sr-fix"><b>Suggested fix:</b> ${failStep.fix}</div>` : ''}
+    </div>`;
+  }
 
   summaryCard.innerHTML = `
     <div class="summary-head">
@@ -2039,6 +2441,7 @@ function showCallSummary(){
       <div class="summary-stat"><div class="label">Negotiated Codec</div><div class="val">${codec}</div></div>
       <div class="summary-stat"><div class="label">Media</div><div class="val">${mediaStatus}</div></div>
     </div>
+    ${reasonHtml}
     <div style="text-align:right;margin-top:10px;"><button class="summary-close" onclick="document.getElementById('summaryCard').style.display='none';">Dismiss ✕</button></div>
   `;
   summaryCard.style.display = 'block';
@@ -2108,6 +2511,7 @@ function plainFor(step){
    CSeq resolver (RFC 3261 §12.2 / §9 rules, simplified for a
    linear, well-ordered request→response step list)
 ========================================================= */
+const INFRA_ENDPOINTS = {P:true, X:true, P2:true, F:true};
 function cseqInfo(steps, idx){
   const step = steps[idx];
   const key = step.callId || sessionCallId;
@@ -2120,7 +2524,7 @@ function cseqInfo(steps, idx){
     const [sFrom, sTo] = s.dir.split('>');
     if(sFrom===sTo){ if(i===idx) return {num:counter, method:lastReqMethod}; continue; }
     if(s.cseqOverride){ if(i===idx) return s.cseqOverride; continue; }
-    const isRelayHop = (sFrom==='P'||sFrom==='X') && (sTo==='B'||sTo==='P'||sTo==='X'||sTo==='A');
+    const isRelayHop = INFRA_ENDPOINTS[sFrom] && (INFRA_ENDPOINTS[sTo] || sTo==='A' || sTo==='B');
     if(!s.code){
       if(isRelayHop){ if(i===idx) return {num:counter, method:lastReqMethod}; continue; }
       if(s.method==='ACK'){ if(i===idx) return {num:lastInvite, method:'INVITE'}; }
@@ -2198,7 +2602,7 @@ function firstIssueIndex(steps){
     const s = steps[i];
     if(s.kind==='media'){
       const es = effectiveMediaStep(s);
-      if(es.degraded) return {index:i, severity:'soft'};
+      if(es.degraded || es.transcodeArtifact) return {index:i, severity:'soft'};
     }
   }
   return {index:-1, severity:null};
@@ -2378,7 +2782,10 @@ function buildDebugTab(step, i){
 
   const issue = firstIssueIndex(steps);
   if(faultMode!=='none'){
-    html += '<div class="fixout" style="border-color:var(--media);margin-top:0;margin-bottom:12px;"><div class="cw">🧪 Fault injection active</div>Media steps in this playthrough are being overridden by the “Inject fault” control, regardless of how this scenario was originally authored.</div>';
+    html += '<div class="fixout" style="border-color:var(--media);margin-top:0;margin-bottom:12px;"><div class="cw">🧪 Media fault injection active</div>Media steps in this playthrough are being overridden by the “Inject fault on media” control, regardless of how this scenario was originally authored.</div>';
+  }
+  if(signalFaultMode!=='none'){
+    html += '<div class="fixout" style="border-color:var(--teardown);margin-top:0;margin-bottom:12px;"><div class="cw">🧪 Signaling fault injection active</div>This playthrough’s successful outcome has been replaced by the “Inject fault on signaling” control — the call fails before ever reaching media, regardless of how this scenario was originally authored.</div>';
   }
   if(issue.index>=0){
     const failStep = steps[issue.index];
@@ -2561,6 +2968,84 @@ function applyTheme(){
 /* =========================================================
    INIT
 ========================================================= */
+/* =========================================================
+   DRAG-TO-RESIZE — full-width/height handles on the box
+   borders, not just a native corner grip.
+========================================================= */
+function makeVerticalResizer(handleEl, targetEl, opts){
+  opts = opts || {};
+  const min = opts.min || 150;
+  const max = opts.max || Math.round(window.innerHeight*0.85);
+  let startY = 0, startH = 0, dragging = false;
+  function onMove(e){
+    if(!dragging) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const newH = Math.min(max, Math.max(min, startH + (clientY - startY)));
+    targetEl.style.height = newH + 'px';
+    e.preventDefault();
+  }
+  function onUp(){
+    dragging = false;
+    handleEl.classList.remove('dragging');
+    document.body.classList.remove('resizing-v');
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    window.removeEventListener('touchmove', onMove);
+    window.removeEventListener('touchend', onUp);
+  }
+  function onDown(e){
+    dragging = true;
+    handleEl.classList.add('dragging');
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startH = targetEl.getBoundingClientRect().height;
+    document.body.classList.add('resizing-v');
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('touchend', onUp);
+    e.preventDefault();
+  }
+  handleEl.addEventListener('mousedown', onDown);
+  handleEl.addEventListener('touchstart', onDown, {passive:false});
+}
+function makeColumnSplitter(handleEl, containerEl, opts){
+  opts = opts || {};
+  const minPct = opts.minPct || 30;
+  const maxPct = opts.maxPct || 75;
+  let dragging = false;
+  function onMove(e){
+    if(!dragging) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const rect = containerEl.getBoundingClientRect();
+    let pct = ((clientX - rect.left) / rect.width) * 100;
+    pct = Math.min(maxPct, Math.max(minPct, pct));
+    containerEl.style.gridTemplateColumns = pct.toFixed(2) + '% 10px 1fr';
+    e.preventDefault();
+  }
+  function onUp(){
+    dragging = false;
+    handleEl.classList.remove('dragging');
+    document.body.classList.remove('resizing-h');
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+    window.removeEventListener('touchmove', onMove);
+    window.removeEventListener('touchend', onUp);
+  }
+  function onDown(e){
+    if(window.innerWidth < 900) return;
+    dragging = true;
+    handleEl.classList.add('dragging');
+    document.body.classList.add('resizing-h');
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('touchend', onUp);
+    e.preventDefault();
+  }
+  handleEl.addEventListener('mousedown', onDown);
+  handleEl.addEventListener('touchstart', onDown, {passive:false});
+}
+
 function init(){
   applyTheme();
   populateCodeSelect();
@@ -2594,7 +3079,12 @@ function init(){
   faultSelect.onchange = ()=>{
     faultMode = faultSelect.value;
     if(lastSelectedStep>=0) selectStep(lastSelectedStep);
+    updateFaultStatus();
   };
+  signalFaultSelect.onchange = ()=> setSignalFault(signalFaultSelect.value);
+  document.getElementById('clearFaultsBtn').onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); clearAllFaults(); };
+  document.getElementById('clearFaultsBtn2').onclick = (e)=>{ e.preventDefault(); clearAllFaults(); };
+  updateFaultStatus();
   exportLogBtn.onclick = exportCaptureLog;
   Array.from(document.querySelectorAll('.ct-btn')).forEach(btn=>{
     btn.onclick = ()=> setCallType(btn.dataset.type);
@@ -2602,6 +3092,11 @@ function init(){
   Array.from(inspTabs.querySelectorAll('.itab')).forEach(btn=>{
     btn.onclick = ()=>{ activeTab = btn.dataset.tab; renderActiveTab(); };
   });
+
+  makeVerticalResizer(document.getElementById('resizeDiagram'), scrollArea, {min:200});
+  makeVerticalResizer(document.getElementById('resizeInspector'), inspBody, {min:160});
+  makeVerticalResizer(document.getElementById('resizeLog'), logBody, {min:100});
+  makeColumnSplitter(document.getElementById('colSplitter'), document.getElementById('mainGrid'));
 }
 init();
 </script>
