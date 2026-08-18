@@ -39,6 +39,12 @@
     -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     text-rendering:optimizeLegibility;
   }
+  html[data-theme="light"] body{
+    background:
+      radial-gradient(ellipse at top left, rgba(37,99,235,0.05), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(168,113,10,0.04), transparent 50%),
+      var(--bg);
+  }
   .wrap{max-width:1180px;margin:0 auto;}
   @media(min-width:1400px){ .wrap{max-width:1560px;} }
   @media(min-width:1700px){ .wrap{max-width:1880px;} }
@@ -56,7 +62,14 @@
     box-shadow:0 1px 2px rgba(20,30,45,0.05), 0 6px 18px -10px rgba(20,30,45,0.12);
   }
 
-  header{margin-bottom:14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:nowrap;}
+  header{
+    margin-bottom:14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;
+    background:linear-gradient(120deg, rgba(59,130,246,0.14), rgba(94,234,212,0.06) 55%, transparent 90%);
+    border:1px solid var(--hair); border-radius:14px; padding:16px 18px;
+  }
+  html[data-theme="light"] header{
+    background:linear-gradient(120deg, rgba(37,99,235,0.08), rgba(14,143,128,0.05) 55%, transparent 90%);
+  }
   .brandRow{display:flex; align-items:center; gap:10px; min-width:0; flex:1 1 auto;}
   .brandMark{border-radius:9px; flex:0 0 auto; box-shadow:0 0 0 1px var(--hair), 0 4px 14px rgba(0,0,0,0.25);}
   .htitle{min-width:0; flex:1 1 auto;}
@@ -65,6 +78,7 @@
   h1{font-family:var(--font-display);font-weight:700;font-size:clamp(17px,4.2vw,27px);margin:5px 0 2px;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .sub{color:var(--muted);font-size:12px;margin:0;max-width:520px;display:none;}
   @media(min-width:560px){ .sub{display:block;} }
+  .header-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;}
   .theme-toggle{
     width:38px;height:38px;flex:0 0 auto;
     display:flex;align-items:center;justify-content:center;
@@ -75,6 +89,15 @@
   }
   .theme-toggle:hover{border-color:var(--sig);transform:scale(1.06);}
   .theme-toggle:active{transform:scale(0.94);}
+  .reset-all-btn{
+    height:38px;flex:0 0 auto;display:flex;align-items:center;gap:5px;
+    padding:0 13px;font-family:var(--font-sans);font-size:12.5px;font-weight:700;
+    background:var(--panel);border:1px solid var(--hair);color:var(--text);
+    border-radius:19px;cursor:pointer;white-space:nowrap;touch-action:manipulation;
+    transition:all .15s ease;
+  }
+  .reset-all-btn:hover{border-color:var(--teardown);color:var(--teardown);}
+  .reset-all-btn:active{transform:scale(0.95);}
 
   /* ---------- Simulation selector (cascading dropdowns) ---------- */
   .selector-card{
@@ -98,15 +121,45 @@
     color:var(--muted);display:flex;align-items:center;gap:7px;white-space:nowrap;
   }
   .calltype-toggle{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--hair);border-radius:8px;padding:2px;}
-  .ct-btn{
+  .ct-btn, .cd-btn, .tr-btn{
     font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 9px;
     background:transparent;border:none;border-radius:5px;color:var(--muted);cursor:pointer;
     transition:all .15s ease;touch-action:manipulation;min-height:28px;
   }
-  .ct-btn:hover:not(:disabled){color:var(--text);}
-  .ct-btn.active{background:var(--sig);color:var(--bg);}
-  .ct-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .ct-btn:hover:not(:disabled), .cd-btn:hover:not(:disabled), .tr-btn:hover:not(:disabled){color:var(--text);}
+  .ct-btn.active, .cd-btn.active, .tr-btn.active{background:var(--sig);color:var(--bg);}
+  .ct-btn:disabled, .cd-btn:disabled, .tr-btn:disabled{opacity:.35;cursor:not-allowed;}
   .calltype-hint{font-size:11px;color:var(--dim);}
+  .calltype-divider{width:1px;height:22px;background:var(--hair);margin:0 2px;flex:0 0 auto;}
+  .calltype-hints{
+    display:flex;gap:5px 14px;flex-wrap:wrap;margin-top:9px;padding-top:9px;
+    border-top:1px solid var(--hair);font-size:11.5px;color:var(--dim);line-height:1.4;
+  }
+  .calltype-hints .calltype-hint:empty{display:none;}
+  /* ---------- Search ---------- */
+  .search-row{position:relative;margin-bottom:12px;}
+  .search-input{
+    width:100%;font-family:var(--font-sans);font-size:16px;font-weight:500;
+    background:var(--panel-2);color:var(--text);border:1px solid var(--hair);border-radius:9px;
+    padding:11px 14px;transition:border-color .15s ease;
+  }
+  .search-input::placeholder{color:var(--dim);font-size:13px;}
+  .search-input:focus{outline:none;border-color:var(--sig);}
+  .search-results{
+    position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;
+    background:var(--panel);border:1px solid var(--hair);border-radius:9px;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,0.5);max-height:320px;overflow-y:auto;
+  }
+  html[data-theme="light"] .search-results{box-shadow:0 8px 24px -8px rgba(20,30,45,0.18);}
+  .search-result{
+    padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--hair);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .search-result:last-child{border-bottom:none;}
+  .search-result:hover, .search-result.hl{background:var(--panel-2);}
+  .search-result .sr-name{font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text);}
+  .search-result .sr-cat{font-family:var(--font-mono);font-size:10px;color:var(--muted);white-space:nowrap;}
+  .search-empty{padding:14px;text-align:center;font-size:12.5px;color:var(--dim);}
   .sel-grid{display:grid;grid-template-columns:1fr;gap:10px;}
   @media(min-width:640px){ .sel-grid{grid-template-columns:1fr 1.4fr;} }
   .sel-grid.single{grid-template-columns:1fr;}
@@ -164,12 +217,14 @@
     color:var(--dim);white-space:nowrap;
   }
   .fault-status.active{color:var(--media);border-color:var(--media-dim);background:rgba(242,184,75,0.1);}
+  html[data-theme="light"] .fault-status.active{background:rgba(168,113,10,0.08);}
   .fault-clear{
     font-family:var(--font-sans);font-size:11px;font-weight:700;padding:4px 10px;
     border-radius:20px;background:rgba(240,101,77,0.1);border:1px solid var(--teardown);
     color:var(--teardown);cursor:pointer;white-space:nowrap;touch-action:manipulation;
     transition:all .15s ease;
   }
+  html[data-theme="light"] .fault-clear{background:rgba(199,64,42,0.08);}
   .fault-clear:hover{background:var(--teardown);color:var(--bg);}
   .fault-clear:active{transform:scale(0.95);}
   .collapse-body{padding:0 14px 14px;border-top:1px solid var(--hair);padding-top:12px;}
@@ -198,6 +253,7 @@
     border:1px solid var(--hair);border-radius:6px;color:var(--muted);cursor:pointer;min-height:40px;touch-action:manipulation;transition:all .15s ease;}
   .speed-btn:active{transform:scale(0.94);}
   .speed-btn.active{color:var(--sig);border-color:var(--sig-dim);background:rgba(94,234,212,0.08);}
+  html[data-theme="light"] .speed-btn.active{background:rgba(14,143,128,0.10);}
   .clock{font-family:var(--font-mono);font-size:12px;color:var(--muted);padding:6px 10px;
     background:var(--panel-2);border:1px solid var(--hair);border-radius:6px;min-width:92px;text-align:center;}
   .clock b{color:var(--text);}
@@ -408,6 +464,8 @@
   .summary-result.pass{background:rgba(124,227,139,0.15);color:var(--ok);border:1px solid var(--ok);}
   .summary-result.fail{background:rgba(240,101,77,0.15);color:var(--teardown);border:1px solid var(--teardown);}
   .summary-result.warn{background:rgba(242,184,75,0.15);color:var(--media);border:1px solid var(--media);}
+  html[data-theme="light"] .summary-result.fail{background:rgba(199,64,42,0.10);}
+  html[data-theme="light"] .summary-result.warn{background:rgba(168,113,10,0.10);}
   .summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
   @media(min-width:640px){ .summary-grid{grid-template-columns:repeat(4,1fr);} }
   .summary-stat{background:var(--panel-2);border:1px solid var(--hair);border-radius:8px;padding:10px 12px;}
@@ -434,6 +492,7 @@
   .log-row{padding:7px 14px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--grid);cursor:pointer;color:var(--muted);}
   .log-row:hover{background:var(--panel-2);}
   .log-row.active{background:rgba(94,234,212,0.07);}
+  html[data-theme="light"] .log-row.active{background:rgba(14,143,128,0.08);}
   .log-row-main{display:grid;grid-template-columns:66px 30px 1fr 120px;gap:10px;align-items:center;}
   .log-row .t{color:var(--dim);}
   .log-row.active .t{color:var(--sig);}
@@ -452,6 +511,57 @@
   ::-webkit-scrollbar-track{background:transparent;}
 
   footer{margin-top:16px;color:var(--dim);font-size:11px;font-family:var(--font-mono);text-align:center;}
+
+  /* ---------- Custom simulation button (header) ---------- */
+  .custom-sim-btn{
+    height:38px;flex:0 0 auto;display:flex;align-items:center;gap:6px;
+    padding:0 14px;font-family:var(--font-sans);font-size:12.5px;font-weight:700;
+    background:var(--teardown);color:#fff;border:1px solid var(--teardown);
+    border-radius:19px;cursor:pointer;white-space:nowrap;touch-action:manipulation;
+    transition:all .15s ease;box-shadow:0 2px 10px -2px rgba(240,101,77,0.5);
+  }
+  html[data-theme="light"] .custom-sim-btn{box-shadow:0 2px 10px -2px rgba(199,64,42,0.4);}
+  .custom-sim-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .custom-sim-btn:active{transform:scale(0.95);}
+
+  /* ---------- Custom builder "page" ---------- */
+  #customBuilderView{animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .cb-topbar{margin-bottom:14px;}
+  .cb-hero{text-align:center;padding:8px 12px 22px;}
+  .cb-hero-icon{font-size:34px;margin-bottom:6px;}
+  .cb-hero h2{font-family:var(--font-display);font-size:clamp(20px,4vw,28px);margin:4px 0 8px;color:var(--text);}
+  .cb-hero p{color:var(--muted);font-size:13px;max-width:560px;margin:0 auto;line-height:1.6;}
+  .cb-form{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+  .cb-section{
+    background:var(--panel);border:1px solid var(--hair);border-radius:12px;padding:16px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.18), 0 8px 24px -12px rgba(0,0,0,0.35);
+  }
+  html[data-theme="light"] .cb-section{box-shadow:0 1px 2px rgba(20,30,45,0.05), 0 6px 18px -10px rgba(20,30,45,0.12);}
+  .cb-section-title{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px;
+  }
+  .cb-field-row{margin-bottom:12px;}
+  .cb-field-row:last-child{margin-bottom:0;}
+  .cb-label{display:block;font-family:var(--font-sans);font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .cb-checkbox{display:flex;align-items:center;gap:8px;font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;}
+  .cb-checkbox input{width:17px;height:17px;accent-color:var(--sig);cursor:pointer;}
+  .cb-subfields{margin-top:12px;padding-top:12px;border-top:1px dashed var(--hair);}
+  .cb-btn{
+    font-family:var(--font-sans);font-size:11px;font-weight:600;padding:5px 9px;
+    background:transparent;border:none;border-radius:5px;color:var(--muted);cursor:pointer;
+    transition:all .15s ease;touch-action:manipulation;min-height:28px;
+  }
+  .cb-btn:hover{color:var(--text);}
+  .cb-btn.active{background:var(--sig);color:var(--bg);}
+  .cb-preview{
+    background:var(--panel-2);border:1px dashed var(--hair);border-radius:10px;padding:14px 16px;
+    font-family:var(--font-mono);font-size:12px;color:var(--sig);line-height:1.7;text-align:center;
+  }
+  .cb-preview .cw{font-family:var(--font-sans);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .cb-run-btn{width:100%;justify-content:center;font-size:14px;padding:14px;min-height:48px;}
+
 </style>
 </head>
 <body>
@@ -466,11 +576,20 @@
         <p class="sub">Real-time sequence visualization of SIP signaling, SDP negotiation, and RTP media transport — with plain-English explanations alongside the raw packets.</p>
       </div>
     </div>
-    <button class="theme-toggle" id="themeBtn" title="Switch theme" aria-label="Switch theme">☀️</button>
+    <div class="header-actions">
+      <button class="custom-sim-btn" id="openBuilderBtn" title="Build a custom simulation topology">🛠️ Custom Simulation</button>
+      <button class="theme-toggle" id="themeBtn" title="Switch theme" aria-label="Switch theme">☀️</button>
+      <button class="reset-all-btn" id="resetAllBtn" title="Reset every option back to defaults" aria-label="Reset all options">⟲ Reset</button>
+    </div>
   </header>
 
+  <div id="mainView">
   <div class="selector-card">
-    <div class="selector-title"><span class="n">1</span>Choose a category, then a simulation</div>
+    <div class="selector-title"><span class="n">1</span>Search, or choose a category, then a simulation</div>
+    <div class="search-row">
+      <input type="text" id="scenarioSearch" class="search-input" placeholder="🔍 Search 47 simulations… e.g. “busy”, “transcod”, “fork”, “echo”" autocomplete="off">
+      <div class="search-results" id="searchResults" style="display:none;"></div>
+    </div>
     <div class="sel-grid" id="selGrid">
       <div class="sel-field">
         <label for="categorySelect">Category</label>
@@ -495,7 +614,24 @@
         <button class="ct-btn" data-type="internal">🏢 Internal</button>
         <button class="ct-btn" data-type="external">🌐 External</button>
       </div>
+      <span class="calltype-divider"></span>
+      <span class="calltype-label"><span class="n">3</span>Direction</span>
+      <div class="calltype-toggle" id="callDirectionRow">
+        <button class="cd-btn" data-dir="outbound">📤 Outbound</button>
+        <button class="cd-btn" data-dir="inbound">📥 Inbound</button>
+      </div>
+      <span class="calltype-divider"></span>
+      <span class="calltype-label"><span class="n">4</span>Transport</span>
+      <div class="calltype-toggle" id="transportRow">
+        <button class="tr-btn" data-transport="udp">UDP</button>
+        <button class="tr-btn" data-transport="tcp">TCP</button>
+        <button class="tr-btn" data-transport="tls">TLS</button>
+      </div>
+    </div>
+    <div class="calltype-hints">
       <span class="calltype-hint" id="callTypeHint"></span>
+      <span class="calltype-hint" id="callDirectionHint"></span>
+      <span class="calltype-hint" id="transportHint"></span>
     </div>
     <div class="sel-meta" id="selMeta"></div>
 
@@ -528,6 +664,10 @@
           <option value="notfound">Force 404 Not Found</option>
           <option value="unavailable">Force 480 Temporarily Unavailable</option>
           <option value="timeout">Force 408 Request Timeout</option>
+          <option value="forbidden">Force 403 Forbidden</option>
+          <option value="notacceptable">Force 488 Not Acceptable Here</option>
+          <option value="servererror">Force 500 Server Internal Error</option>
+          <option value="serviceunavailable">Force 503 Service Unavailable</option>
         </select>
       </div>
       <div class="fault-row">
@@ -609,7 +749,119 @@
   </div>
 
   <footer>All addressing shown is illustrative (RFC 3261 / RFC 4566 / RFC 3550 / RFC 3515 / RFC 4028 conventions).</footer>
+  </div>
+  <!-- /mainView -->
+
+  <div id="customBuilderView" style="display:none;">
+    <div class="cb-topbar">
+      <button class="btn" id="cbBackBtn">← Back to Simulations</button>
+    </div>
+    <div class="cb-hero">
+      <div class="cb-hero-icon">🛠️</div>
+      <h2>Build a Custom Simulation</h2>
+      <p>Construct your own call topology — however many PBX hops it really takes, an optional firewall, a carrier if it leaves your network — then run it through the exact same analyzer as every built-in simulation. This never changes any of the 47 built-in simulations.</p>
+    </div>
+
+    <div class="cb-form">
+      <div class="cb-section">
+        <div class="cb-section-title"><span class="n">1</span>Name it (optional)</div>
+        <input type="text" id="cbName" class="search-input" placeholder="e.g. “Branch office call via 2 PBXs and a firewall”" autocomplete="off">
+      </div>
+
+      <div class="cb-section">
+        <div class="cb-section-title"><span class="n">2</span>Call type, direction &amp; transport</div>
+        <div class="calltype-row" style="border-top:none;margin-top:0;padding-top:0;">
+          <span class="calltype-label">Call type</span>
+          <div class="calltype-toggle">
+            <button class="cb-btn active" data-group="callType" data-value="internal">🏢 Internal</button>
+            <button class="cb-btn" data-group="callType" data-value="external">🌐 External</button>
+          </div>
+          <span class="calltype-divider"></span>
+          <span class="calltype-label">Direction</span>
+          <div class="calltype-toggle">
+            <button class="cb-btn active" data-group="direction" data-value="outbound">📤 Outbound</button>
+            <button class="cb-btn" data-group="direction" data-value="inbound">📥 Inbound</button>
+          </div>
+          <span class="calltype-divider"></span>
+          <span class="calltype-label">Transport</span>
+          <div class="calltype-toggle">
+            <button class="cb-btn active" data-group="transport" data-value="udp">UDP</button>
+            <button class="cb-btn" data-group="transport" data-value="tcp">TCP</button>
+            <button class="cb-btn" data-group="transport" data-value="tls">TLS</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cb-section">
+        <div class="cb-section-title"><span class="n">3</span>Topology</div>
+        <div class="cb-field-row">
+          <label class="cb-label" for="cbPbxCount">Number of PBX / SBC hops between the two parties</label>
+          <select id="cbPbxCount" class="fault-select">
+            <option value="0">0 — direct, no PBX at all</option>
+            <option value="1" selected>1 PBX</option>
+            <option value="2">2 PBX hops (e.g. two sites)</option>
+            <option value="3">3 PBX hops</option>
+          </select>
+        </div>
+        <div class="cb-field-row">
+          <label class="cb-checkbox"><input type="checkbox" id="cbFirewallEnabled"> Include a firewall somewhere in the path</label>
+        </div>
+        <div id="cbFirewallOptions" class="cb-subfields" style="display:none;">
+          <div class="cb-field-row">
+            <label class="cb-label" for="cbFirewallPosition">Firewall position</label>
+            <select id="cbFirewallPosition" class="fault-select">
+              <option value="near-a">Near the caller</option>
+              <option value="middle" selected>In the middle of the path</option>
+              <option value="near-b">Near the destination</option>
+            </select>
+          </div>
+          <div class="cb-field-row">
+            <label class="cb-label" for="cbFirewallBehavior">Firewall behavior</label>
+            <select id="cbFirewallBehavior" class="fault-select">
+              <option value="passthrough">Passes traffic through cleanly</option>
+              <option value="oneway">Blocks return audio (one-way audio)</option>
+              <option value="noaudio">Blocks all RTP (no audio)</option>
+              <option value="degraded">Introduces packet loss / jitter</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="cb-section">
+        <div class="cb-section-title"><span class="n">4</span>Codec &amp; outcome</div>
+        <div class="cb-field-row">
+          <label class="cb-label" for="cbCodec">Codec offered</label>
+          <select id="cbCodec" class="fault-select">
+            <option value="opus" selected>Opus 48kHz (wideband)</option>
+            <option value="g722">G.722 (wideband)</option>
+            <option value="pcmu">PCMU / G.711 µ-law</option>
+            <option value="pcma">PCMA / G.711 A-law</option>
+            <option value="g729">G.729 (compressed)</option>
+          </select>
+        </div>
+        <div class="cb-field-row">
+          <label class="cb-label" for="cbOutcome">Call outcome</label>
+          <select id="cbOutcome" class="fault-select">
+            <option value="success" selected>Succeeds normally</option>
+            <option value="busy">Fails — 486 Busy Here</option>
+            <option value="notfound">Fails — 404 Not Found</option>
+            <option value="unavailable">Fails — 480 Temporarily Unavailable</option>
+            <option value="timeout">Fails — 408 Request Timeout</option>
+            <option value="forbidden">Fails — 403 Forbidden</option>
+            <option value="notacceptable">Fails — 488 Not Acceptable Here (codec mismatch)</option>
+            <option value="servererror">Fails — 500 Server Internal Error</option>
+            <option value="serviceunavailable">Fails — 503 Service Unavailable</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cb-preview" id="cbPreview"></div>
+
+      <button class="btn primary cb-run-btn" id="cbRunBtn">▶ &nbsp;Build &amp; Run Simulation</button>
+    </div>
+  </div>
 </div>
+<!-- /wrap -->
 
 <script>
 /* =========================================================
@@ -622,7 +874,11 @@ const ENDPOINTS = {
   P: { label:'PBX / SBC / Proxy', ip:'10.0.0.1', port:'5060', icon:'🖥️' },
   F: { label:'Conference Focus', ip:'10.0.0.50', port:'5060', icon:'🎛️' },
   X: { label:'Carrier / SIP Trunk', ip:'203.0.113.10', port:'5060', icon:'🌐' },
-  P2: { label:'Proxy 2 (misrouted)', ip:'10.0.0.2', port:'5060', icon:'🖥️' }
+  P2: { label:'Proxy 2 (misrouted)', ip:'10.0.0.2', port:'5060', icon:'🖥️' },
+  CP1: { label:'PBX #1', ip:'10.1.0.1', port:'5060', icon:'🖥️' },
+  CP2: { label:'PBX #2', ip:'10.1.0.2', port:'5060', icon:'🖥️' },
+  CP3: { label:'PBX #3', ip:'10.1.0.3', port:'5060', icon:'🖥️' },
+  CFW: { label:'Firewall', ip:'10.2.0.1', port:'5060', icon:'🧱' }
 };
 
 const PLAIN = {
@@ -1393,6 +1649,20 @@ const SCENARIO_TEMPLATES = {
     sig('P2>P','483 Too Many Hops',{code:483, note:'Per RFC 3261, a proxy that would decrement Max-Forwards below zero must reject the request instead of forwarding it again.', plain:'Rather than forward the request once more and risk looping forever, this proxy gives up and reports the failure back the way it came.', fix:'Check both proxies’ routing / dial-plan tables for this destination — one of them has a rule that sends the call right back where it came from. In a real packet capture, trace the Via header chain to see exactly which hop repeats.', rootCause:['Proxy 2’s routing table sends this destination to Proxy 1','Proxy 1’s routing table sends the same destination to Proxy 2','Each hop decrements Max-Forwards, which is the only thing stopping an infinite loop','Once Max-Forwards would go below zero, the proxy must reject rather than loop forever']}),
     sig('P>A','483 Too Many Hops',{code:483, note:'Relayed back to the original caller.'}),
     sig('A>P','ACK',{})
+  ]},
+
+  custom:{ name:'Custom Simulation', category:'custom', isCustom:true, endpoints:['A','CP1','B'], steps:[
+    sig('A>CP1','INVITE',{firstRequest:true, sdp:{c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP 111', codecs:['opus/48000/2 (111)']}}),
+    sig('CP1>CP1','100 Trying',{code:100}),
+    sig('CP1>B','INVITE',{}),
+    sig('B>CP1','180 Ringing',{code:180}),
+    sig('CP1>A','180 Ringing',{code:180}),
+    sig('B>CP1','200 OK',{code:200, sdp:{c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP 111', codecs:['opus/48000/2 (111) — accepted']}}),
+    sig('CP1>A','200 OK',{code:200}),
+    sig('A>B','ACK',{direct:true}),
+    media([['A','B']],'RTP — Opus 48kHz',12000,{}),
+    sig('A>B','BYE',{direct:true, teardown:true}),
+    sig('B>A','200 OK',{code:200, direct:true, teardown:true})
   ]}
 };
 
@@ -1429,15 +1699,47 @@ Object.keys(SCENARIO_TEMPLATES).forEach(k=>propagateRelayedSdp(SCENARIO_TEMPLATE
    Internal mode returns the template unchanged.
 ========================================================= */
 let callType = 'internal';
-function applyCallType(templateSteps, templateEndpoints, mode){
+function endpointSwapAB(id){ return id==='A' ? 'B' : (id==='B' ? 'A' : id); }
+function applyCallDirection(templateSteps, templateEndpoints, direction){
+  if(direction!=='inbound') return { steps: templateSteps, endpoints: templateEndpoints };
+  const steps = templateSteps.map(step=>{
+    if(step.kind==='signal'){
+      const [from,to] = step.dir.split('>');
+      return Object.assign({}, step, {dir: endpointSwapAB(from)+'>'+endpointSwapAB(to)});
+    }
+    if(step.kind==='media'){
+      return Object.assign({}, step, {pairs: step.pairs.map(p=>[endpointSwapAB(p[0]), endpointSwapAB(p[1])])});
+    }
+    if(step.kind==='wait'){
+      return Object.assign({}, step, {at: endpointSwapAB(step.at)});
+    }
+    return step;
+  });
+  const endpoints = templateEndpoints.map(endpointSwapAB);
+  return { steps, endpoints };
+}
+function scenarioSupportsDirection(key){
+  const tpl = SCENARIO_TEMPLATES[key];
+  if(tpl.isCustom) return false;
+  let hasA=false, hasB=false;
+  tpl.steps.forEach(s=>{
+    if(s.kind==='signal'){ s.dir.split('>').forEach(e=>{ if(e==='A') hasA=true; if(e==='B') hasB=true; }); }
+    else if(s.kind==='media'){ s.pairs.forEach(p=>{ if(p[0]==='A'||p[1]==='A') hasA=true; if(p[0]==='B'||p[1]==='B') hasB=true; }); }
+    else if(s.kind==='wait'){ if(s.at==='A') hasA=true; if(s.at==='B') hasB=true; }
+  });
+  return hasA && hasB;
+}
+function applyCallType(templateSteps, templateEndpoints, mode, direction){
   const hasPBHop = templateSteps.some(s=>s.kind==='signal' && (s.dir==='P>B'||s.dir==='B>P'));
   if(mode!=='external' || !hasPBHop){
     return { steps: templateSteps, endpoints: templateEndpoints };
   }
+  const insertBeforeP = direction==='inbound';
   const newEndpoints = [];
   templateEndpoints.forEach(e=>{
+    if(e==='P' && insertBeforeP) newEndpoints.push('X');
     newEndpoints.push(e);
-    if(e==='P') newEndpoints.push('X');
+    if(e==='P' && !insertBeforeP) newEndpoints.push('X');
   });
   const newSteps = [];
   templateSteps.forEach(step=>{
@@ -1468,10 +1770,14 @@ function applyCallType(templateSteps, templateEndpoints, mode){
    what happens, not just what a tooltip says.
 ========================================================= */
 const SIGNAL_FAULTS = {
-  busy:       { code:486, method:'486 Busy Here' },
-  notfound:   { code:404, method:'404 Not Found' },
-  unavailable:{ code:480, method:'480 Temporarily Unavailable' },
-  timeout:    { code:408, method:'408 Request Timeout' }
+  busy:        { code:486, method:'486 Busy Here' },
+  notfound:    { code:404, method:'404 Not Found' },
+  unavailable: { code:480, method:'480 Temporarily Unavailable' },
+  timeout:     { code:408, method:'408 Request Timeout' },
+  forbidden:   { code:403, method:'403 Forbidden' },
+  notacceptable:{ code:488, method:'488 Not Acceptable Here' },
+  servererror: { code:500, method:'500 Server Internal Error' },
+  serviceunavailable:{ code:503, method:'503 Service Unavailable' }
 };
 function applySignalingFault(templateSteps, mode){
   const fault = SIGNAL_FAULTS[mode];
@@ -1508,19 +1814,120 @@ function applySignalingFault(templateSteps, mode){
   return out;
 }
 
+/* =========================================================
+   CUSTOM SIMULATION BUILDER
+   Builds a fresh, user-defined topology (0–3 PBX hops, an
+   optional firewall, an optional carrier) and generates a
+   normal successful call across it, then reuses the exact
+   same, already-tested applyCallDirection / applySignalingFault
+   transforms every other scenario uses. Never touches
+   SCENARIO_TEMPLATES for any of the 47 built-in scenarios.
+========================================================= */
+const CUSTOM_CODECS = {
+  opus:{ pt:111, label:'Opus 48kHz', entry:'opus/48000/2 (111)' },
+  g722:{ pt:9,   label:'G.722 wideband', entry:'G.722/8000 (9)' },
+  pcmu:{ pt:0,   label:'PCMU (G.711 µ-law)', entry:'PCMU/8000 (0)' },
+  pcma:{ pt:8,   label:'PCMA (G.711 A-law)', entry:'PCMA/8000 (8)' },
+  g729:{ pt:18,  label:'G.729 (compressed)', entry:'G.729/8000 (18)' }
+};
+const FIREWALL_BEHAVIORS = {
+  passthrough:{ label:'Passes traffic through cleanly' },
+  oneway:{ label:'Blocks return audio (one-way audio)' },
+  noaudio:{ label:'Blocks all RTP (no audio)' },
+  degraded:{ label:'Introduces packet loss / jitter' }
+};
+function buildCustomTopology(params){
+  const mid = [];
+  for(let i=1;i<=params.numPbx;i++) mid.push('CP'+i);
+  if(params.callType==='external') mid.push('X');
+  if(params.firewall.enabled){
+    let idx;
+    if(params.firewall.position==='near-a') idx = 0;
+    else if(params.firewall.position==='near-b') idx = mid.length;
+    else idx = Math.floor(mid.length/2);
+    mid.splice(idx, 0, 'CFW');
+  }
+  return ['A', ...mid, 'B'];
+}
+function chainHops(seq){
+  const hops = [];
+  for(let i=0;i<seq.length-1;i++) hops.push([seq[i], seq[i+1]]);
+  return hops;
+}
+function generateCustomSteps(endpoints, params){
+  const steps = [];
+  const hops = chainHops(endpoints);
+  const codec = CUSTOM_CODECS[params.codec] || CUSTOM_CODECS.opus;
+  const offerSdp = {c:'IN IP4 192.168.1.100', m:'audio 40000 RTP/AVP '+codec.pt, codecs:[codec.entry]};
+  const answerSdp = {c:'IN IP4 192.168.1.200', m:'audio 50000 RTP/AVP '+codec.pt, codecs:[codec.entry+' — accepted']};
+
+  hops.forEach((hop,i)=>{
+    const extra = {};
+    if(i===0){ extra.firstRequest = true; extra.sdp = offerSdp; extra.plain = 'User A starts the call across the custom topology you built.'; }
+    steps.push(sig(hop[0]+'>'+hop[1], 'INVITE', extra));
+    if(i===0 && hops.length>1){
+      steps.push(sig(hop[1]+'>'+hop[1], '100 Trying', {code:100}));
+    }
+  });
+
+  const backHops = hops.slice().reverse().map(h=>[h[1], h[0]]);
+  backHops.forEach(hop=> steps.push(sig(hop[0]+'>'+hop[1], '180 Ringing', {code:180})));
+  backHops.forEach((hop,i)=> steps.push(sig(hop[0]+'>'+hop[1], '200 OK', {code:200, ...(i===0?{sdp:answerSdp, plain:'User B answers.'}:{})})));
+
+  steps.push(sig('A>B', 'ACK', {direct:true}));
+
+  const mediaExtra = { note: undefined };
+  if(params.firewall.enabled && params.firewall.behavior!=='passthrough'){
+    if(params.firewall.behavior==='oneway') Object.assign(mediaExtra, {oneway:'B>A', note:'The firewall in this path blocks return audio.', plain:'Only one direction of audio works because of the firewall you configured.', fix:'Open the firewall for the RTP port range in both directions.', rootCause:['A firewall sits in the media path','It allows outbound RTP but blocks the return direction','Result: one-way audio']});
+    else if(params.firewall.behavior==='noaudio') Object.assign(mediaExtra, {noaudio:true, note:'The firewall in this path blocks RTP entirely.', plain:'Signaling succeeds, but no audio gets through in either direction because of the firewall you configured.', fix:'Open the firewall for the full RTP UDP port range used by your endpoints.', rootCause:['A firewall sits in the media path','It blocks the RTP/UDP port range entirely','Result: total silence despite a “connected” call']});
+    else if(params.firewall.behavior==='degraded') Object.assign(mediaExtra, {degraded:true, note:'The firewall/link in this path introduces packet loss and jitter.', plain:'Audio works both ways but sounds choppy because of the firewall or link you configured.'});
+  }
+  steps.push(media([['A','B']], 'RTP — '+codec.label, 12000, mediaExtra));
+
+  steps.push(sig('A>B','BYE',{direct:true, teardown:true}));
+  steps.push(sig('B>A','200 OK',{code:200, direct:true, teardown:true}));
+  return steps;
+}
+function runCustomBuilder(params){
+  const endpoints = buildCustomTopology(params);
+  let steps = generateCustomSteps(endpoints, params);
+  const dirResult = applyCallDirection(steps, endpoints, params.direction);
+  steps = applySignalingFault(dirResult.steps, params.outcome);
+  SCENARIO_TEMPLATES.custom.endpoints = dirResult.endpoints;
+  SCENARIO_TEMPLATES.custom.steps = steps;
+  SCENARIO_TEMPLATES.custom.name = params.name || 'Custom Simulation';
+  SCENARIOS.custom.endpoints = dirResult.endpoints;
+  SCENARIOS.custom.steps = steps;
+  SCENARIOS.custom.name = SCENARIO_TEMPLATES.custom.name;
+  callType = params.callType;
+  callDirection = params.direction;
+  transportMode = params.transport;
+}
+
 const SCENARIOS = {};
 Object.keys(SCENARIO_TEMPLATES).forEach(k=>{ SCENARIOS[k] = Object.assign({}, SCENARIO_TEMPLATES[k]); });
 let signalFaultMode = 'none';
+let callDirection = 'outbound';
+let transportMode = 'udp';
+function portForEndpoint(id){
+  const ep = ENDPOINTS[id];
+  const base = (ep && ep.port) ? Number(ep.port) : 5060;
+  if(transportMode==='tls' && base===5060) return 5061;
+  return base;
+}
+function sipScheme(){ return transportMode==='tls' ? 'sips' : 'sip'; }
 function rebuildScenario(key){
   const tpl = SCENARIO_TEMPLATES[key];
-  if(tpl.isExplorer) return;
-  let {steps, endpoints} = applyCallType(tpl.steps, tpl.endpoints, callType);
+  if(tpl.isExplorer || tpl.isCustom) return;
+  const dirResult = applyCallDirection(tpl.steps, tpl.endpoints, callDirection);
+  let {steps, endpoints} = applyCallType(dirResult.steps, dirResult.endpoints, callType, callDirection);
   steps = applySignalingFault(steps, signalFaultMode);
   SCENARIOS[key].steps = steps;
   SCENARIOS[key].endpoints = endpoints;
 }
 function scenarioSupportsCallType(key){
   const tpl = SCENARIO_TEMPLATES[key];
+  if(tpl.isCustom) return false;
   return tpl.steps.some(s=>s.kind==='signal' && (s.dir==='P>B'||s.dir==='B>P'));
 }
 
@@ -1535,7 +1942,8 @@ const CATEGORIES = [
   {id:'carrier', label:'Carrier & Trunking'},
   {id:'errors', label:'Signaling & Errors'},
   {id:'methods', label:'Other SIP Methods'},
-  {id:'reference', label:'Response Code Lookup'}
+  {id:'reference', label:'Response Code Lookup'},
+  {id:'custom', label:'My Custom Simulation'}
 ];
 function scenariosInCategory(catId){ return Object.keys(SCENARIO_TEMPLATES).filter(k=>SCENARIO_TEMPLATES[k].category===catId); }
 
@@ -1627,7 +2035,8 @@ function regenerateRespCode(code){
   const isRedirect = classOf(code)==='3xx';
   const baseEndpoints = isRedirect ? ['A','P','B','C'] : ['A','P','B'];
   const baseSteps = propagateRelayedSdp(generateResponseSteps(code));
-  const {steps, endpoints} = applyCallType(baseSteps, baseEndpoints, callType);
+  const dirResult = applyCallDirection(baseSteps, baseEndpoints, callDirection);
+  const {steps, endpoints} = applyCallType(dirResult.steps, dirResult.endpoints, callType, callDirection);
   SCENARIOS.respcode.endpoints = endpoints;
   SCENARIOS.respcode.steps = steps;
   SCENARIOS.respcode.name = code+' '+info.name;
@@ -1675,7 +2084,8 @@ function generateSdpParamSteps(key){
 function regenerateSdpParam(key){
   const info = SDP_PARAMS[key] || {label:'SDP parameter'};
   const baseSteps = propagateRelayedSdp(generateSdpParamSteps(key));
-  const {steps, endpoints} = applyCallType(baseSteps, ['A','P','B'], callType);
+  const dirResult = applyCallDirection(baseSteps, ['A','P','B'], callDirection);
+  const {steps, endpoints} = applyCallType(dirResult.steps, dirResult.endpoints, callType, callDirection);
   SCENARIOS.sdpparam.endpoints = endpoints;
   SCENARIOS.sdpparam.steps = steps;
   SCENARIOS.sdpparam.name = info.label;
@@ -1708,9 +2118,13 @@ const TRANSIT_MS = 950;
 
 const categorySelect = document.getElementById('categorySelect');
 const scenarioSelect = document.getElementById('scenarioSelect');
+const scenarioSearch = document.getElementById('scenarioSearch');
+const searchResults = document.getElementById('searchResults');
 const scenarioField = document.getElementById('scenarioField');
 const selMeta = document.getElementById('selMeta');
 const callTypeHint = document.getElementById('callTypeHint');
+const callDirectionHint = document.getElementById('callDirectionHint');
+const transportHint = document.getElementById('transportHint');
 const scrollArea = document.getElementById('scrollArea');
 const diagramHscroll = document.getElementById('diagramHscroll');
 const diagramInner = document.getElementById('diagramInner');
@@ -1728,6 +2142,7 @@ const stopBtn = document.getElementById('stopBtn');
 const restartBtn = document.getElementById('restartBtn');
 const speedGroup = document.getElementById('speedGroup');
 const themeBtn = document.getElementById('themeBtn');
+const resetAllBtn = document.getElementById('resetAllBtn');
 const codePicker = document.getElementById('codePicker');
 const codeSelect = document.getElementById('codeSelect');
 const sdpPicker = document.getElementById('sdpPicker');
@@ -1739,7 +2154,7 @@ const exportLogBtn = document.getElementById('exportLogBtn');
 
 const CATEGORY_ICON = {
   core:'📞', transfer:'🔀', forwarding:'↪️', multiparty:'👥',
-  faxdtmf:'📠', sdp:'🧩', audioissues:'🎧', carrier:'🛰️', errors:'⚠️', methods:'⚙️', reference:'📖'
+  faxdtmf:'📠', sdp:'🧩', audioissues:'🎧', carrier:'🛰️', errors:'⚠️', methods:'⚙️', reference:'📖', custom:'🛠️'
 };
 
 /* =========================================================
@@ -1770,15 +2185,62 @@ function buildScenarioSelect(){
   scenarioField.style.display = onlyOne ? 'none' : '';
   document.getElementById('selGrid').classList.toggle('single', onlyOne);
 }
+
+/* =========================================================
+   SEARCH — quick lookup across every scenario, regardless of
+   category, without needing to know where it lives.
+========================================================= */
+function buildSearchIndex(){
+  return Object.keys(SCENARIO_TEMPLATES).map(key=>{
+    const tpl = SCENARIO_TEMPLATES[key];
+    const cat = CATEGORIES.find(c=>c.id===tpl.category);
+    return { key, name: tpl.name, categoryId: tpl.category, categoryLabel: cat ? cat.label : tpl.category };
+  });
+}
+const SEARCH_INDEX = buildSearchIndex();
+function runSearch(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return [];
+  return SEARCH_INDEX.filter(item=>
+    item.name.toLowerCase().indexOf(q)>=0 || item.categoryLabel.toLowerCase().indexOf(q)>=0
+  ).slice(0, 10);
+}
+function renderSearchResults(query){
+  const results = runSearch(query);
+  if(!query.trim()){
+    searchResults.style.display = 'none';
+    searchResults.innerHTML = '';
+    return;
+  }
+  if(!results.length){
+    searchResults.innerHTML = '<div class="search-empty">No simulations match “'+query.trim()+'”.</div>';
+  } else {
+    searchResults.innerHTML = results.map((r,i)=>
+      '<div class="search-result'+(i===0?' hl':'')+'" data-key="'+r.key+'">'+
+        '<span class="sr-name">'+(CATEGORY_ICON[r.categoryId]||'')+' '+r.name+'</span>'+
+        '<span class="sr-cat">'+r.categoryLabel+'</span>'+
+      '</div>'
+    ).join('');
+    Array.from(searchResults.querySelectorAll('.search-result')).forEach(el=>{
+      el.onclick = ()=>{
+        switchScenario(el.dataset.key);
+        scenarioSearch.value = '';
+        searchResults.style.display = 'none';
+      };
+    });
+  }
+  searchResults.style.display = 'block';
+}
 function updateSelMeta(){
   const sc = SCENARIOS[scenarioKey];
   const cat = CATEGORIES.find(c=>c.id===sc.category);
   const stepCount = sc.isSdpExplorer ? '(varies by parameter)' : sc.isExplorer ? '(varies by code)' : sc.steps.length + ' steps';
   const ctChip = scenarioSupportsCallType(scenarioKey) ? '<span class="chip">'+(callType==='external'?'🌐 External':'🏢 Internal')+'</span>' : '';
+  const cdChip = scenarioSupportsDirection(scenarioKey) ? '<span class="chip">'+(callDirection==='inbound'?'📥 Inbound':'📤 Outbound')+'</span>' : '';
   selMeta.innerHTML =
     '<span class="chip">' + (CATEGORY_ICON[sc.category]||'') + ' ' + (cat?cat.label:sc.category) + '</span>' +
     '<span class="chip">' + sc.endpoints.length + ' endpoints</span>' +
-    '<span class="chip">' + stepCount + '</span>' + ctChip;
+    '<span class="chip">' + stepCount + '</span>' + ctChip + cdChip;
 }
 function buildCallTypeUI(){
   const supported = scenarioSupportsCallType(scenarioKey);
@@ -1790,6 +2252,34 @@ function buildCallTypeUI(){
     ? (callType==='external' ? 'A Carrier / SIP Trunk leg is inserted between the PBX and the far end.' : 'Both parties are treated as being on the same local system.')
     : 'Not applicable to this simulation — no PBX↔far-end leg to route externally.';
 }
+function buildCallDirectionUI(){
+  const supported = scenarioSupportsDirection(scenarioKey);
+  Array.from(document.querySelectorAll('.cd-btn')).forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.dir===callDirection);
+    btn.disabled = !supported;
+  });
+  callDirectionHint.textContent = supported
+    ? (callDirection==='inbound' ? 'User B originates the call; User A is the one being reached.' : 'User A originates the call; User B is the one being reached.')
+    : 'Not applicable to this simulation — there’s no second party to swap.';
+}
+const TRANSPORT_HINTS = {
+  udp: 'UDP: connectionless — the sender must retransmit if no response arrives in time. Port 5060.',
+  tcp: 'TCP: connection-oriented and reliable — no SIP-level retransmission needed, but a handshake happens first. Port 5060.',
+  tls: 'TLS (SIPS): encrypted end-to-end — needs a TLS handshake before the first message. Port 5061.'
+};
+function buildTransportUI(){
+  Array.from(document.querySelectorAll('.tr-btn')).forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.transport===transportMode);
+  });
+  transportHint.textContent = TRANSPORT_HINTS[transportMode] || '';
+}
+function setTransport(mode){
+  if(transportMode===mode) return;
+  transportMode = mode;
+  buildTransportUI();
+  buildColumns();
+  if(lastSelectedStep>=0) selectStep(lastSelectedStep);
+}
 function setCallType(mode){
   if(callType===mode) return;
   callType = mode;
@@ -1798,6 +2288,19 @@ function setCallType(mode){
   else if(tpl.isExplorer) regenerateRespCode(codeSelect.value);
   else rebuildScenario(scenarioKey);
   buildCallTypeUI();
+  updateSelMeta();
+  buildColumns();
+  computeLayout();
+  resetState();
+}
+function setCallDirection(dir){
+  if(callDirection===dir) return;
+  callDirection = dir;
+  const tpl = SCENARIO_TEMPLATES[scenarioKey];
+  if(tpl.isSdpExplorer) regenerateSdpParam(sdpSelect.value);
+  else if(tpl.isExplorer) regenerateRespCode(codeSelect.value);
+  else rebuildScenario(scenarioKey);
+  buildCallDirectionUI();
   updateSelMeta();
   buildColumns();
   computeLayout();
@@ -1843,6 +2346,47 @@ function clearAllFaults(){
     updateFaultStatus();
   }
 }
+function resetAllOptions(){
+  pause();
+  faultMode = 'none';
+  faultSelect.value = 'none';
+  signalFaultMode = 'none';
+  signalFaultSelect.value = 'none';
+  callType = 'internal';
+  callDirection = 'outbound';
+  transportMode = 'udp';
+  speed = 1;
+  scenarioSearch.value = '';
+  searchResults.style.display = 'none';
+  Array.from(document.querySelectorAll('details.collapse-panel')).forEach(d=> d.open = false);
+  buildSpeedGroup();
+  resetCustomBuilderForm();
+
+  const builderOpen = document.getElementById('customBuilderView').style.display !== 'none';
+  if(builderOpen){
+    // Stay on the builder page — just clear its form back to defaults, don't navigate away.
+    updateFaultStatus();
+    return;
+  }
+
+  switchScenario('standard');
+  updateFaultStatus();
+}
+function resetCustomBuilderForm(){
+  document.getElementById('cbName').value = '';
+  document.getElementById('cbPbxCount').value = '1';
+  document.getElementById('cbFirewallEnabled').checked = false;
+  document.getElementById('cbFirewallOptions').style.display = 'none';
+  document.getElementById('cbFirewallPosition').value = 'middle';
+  document.getElementById('cbFirewallBehavior').value = 'passthrough';
+  document.getElementById('cbCodec').value = 'opus';
+  document.getElementById('cbOutcome').value = 'success';
+  const cbDefaults = {callType:'internal', direction:'outbound', transport:'udp'};
+  Array.from(document.querySelectorAll('.cb-btn')).forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.value === cbDefaults[btn.dataset.group]);
+  });
+  updateCbPreview();
+}
 function buildSpeedGroup(){
   speedGroup.innerHTML = '';
   [0.5,1,2].forEach(s=>{
@@ -1872,7 +2416,7 @@ function buildColumns(){
     const ep = ENDPOINTS[id];
     const head = document.createElement('div');
     head.className = 'col-head';
-    head.innerHTML = `<div class="ep-icon">${ep.icon||'📡'}</div><div class="id">${ep.label}</div><div class="ip">${ep.ip}${ep.port?':'+ep.port:''}</div>`;
+    head.innerHTML = `<div class="ep-icon">${ep.icon||'📡'}</div><div class="id">${ep.label}</div><div class="ip">${ep.ip}${ep.port?':'+portForEndpoint(id):''}</div>`;
     colHeadersEl.appendChild(head);
 
     const line = document.createElement('div');
@@ -1953,6 +2497,8 @@ function switchScenario(key){
   codePicker.style.display = (SCENARIOS[key].isExplorer && !SCENARIOS[key].isSdpExplorer) ? 'block' : 'none';
   sdpPicker.style.display = SCENARIOS[key].isSdpExplorer ? 'block' : 'none';
   buildCallTypeUI();
+  buildCallDirectionUI();
+  buildTransportUI();
   updateSelMeta();
   buildColumns();
   computeLayout();
@@ -2511,7 +3057,7 @@ function plainFor(step){
    CSeq resolver (RFC 3261 §12.2 / §9 rules, simplified for a
    linear, well-ordered request→response step list)
 ========================================================= */
-const INFRA_ENDPOINTS = {P:true, X:true, P2:true, F:true};
+const INFRA_ENDPOINTS = {P:true, X:true, P2:true, F:true, CP1:true, CP2:true, CP3:true, CFW:true};
 function cseqInfo(steps, idx){
   const step = steps[idx];
   const key = step.callId || sessionCallId;
@@ -2699,18 +3245,20 @@ function buildRawMessage(step, i){
   const reqTo = isResp ? from : to;
   const branch = 'z9hG4bK' + hashStr(callId+i).toString(16).slice(0,6);
   const {num, method:cMethod} = cseqInfo(steps, i);
+  const scheme = sipScheme();
+  const transportTag = transportMode.toUpperCase();
 
   const lines = [];
   if(isResp){ lines.push(`SIP/2.0 ${step.code} ${step.method.replace(/^\d+\s*/,'')}`); }
-  else { lines.push(`${step.method==='RTP Event'?'INFO':step.method} sip:${userOf(reqTo)}@domain.com SIP/2.0`); }
-  lines.push(`Via: SIP/2.0/UDP ${Fep.ip}:${Fep.port||5060};branch=${branch}`);
+  else { lines.push(`${step.method==='RTP Event'?'INFO':step.method} ${scheme}:${userOf(reqTo)}@domain.com SIP/2.0`); }
+  lines.push(`Via: SIP/2.0/${transportTag} ${Fep.ip}:${portForEndpoint(from)};branch=${branch}`);
   if(!isResp) lines.push('Max-Forwards: 70');
-  lines.push(`From: <sip:${userOf(reqFrom)}@domain.com>;tag=${tagFor(reqFrom)}`);
+  lines.push(`From: <${scheme}:${userOf(reqFrom)}@domain.com>;tag=${tagFor(reqFrom)}`);
   const includeToTag = isResp || !step.firstRequest;
-  lines.push(`To: <sip:${userOf(reqTo)}@domain.com>${includeToTag ? ';tag='+tagFor(reqTo) : ''}`);
+  lines.push(`To: <${scheme}:${userOf(reqTo)}@domain.com>${includeToTag ? ';tag='+tagFor(reqTo) : ''}`);
   lines.push(`Call-ID: ${callId}`);
   lines.push(`CSeq: ${num} ${cMethod||step.method}`);
-  lines.push(`Contact: <sip:${userOf(from)}@${Fep.ip}:${Fep.port||5060}>`);
+  lines.push(`Contact: <${scheme}:${userOf(from)}@${Fep.ip}:${portForEndpoint(from)}>`);
   if(step.extraHeaders) step.extraHeaders.forEach(h=>lines.push(h));
   if(step.sdp && (step.sdp.c || step.sdp.m || step.sdp.raw || (step.sdp.codecs&&step.sdp.codecs.length))){
     lines.push('Content-Type: application/sdp');
@@ -3046,6 +3594,45 @@ function makeColumnSplitter(handleEl, containerEl, opts){
   handleEl.addEventListener('touchstart', onDown, {passive:false});
 }
 
+function getCbParams(){
+  const ctBtn = document.querySelector('.cb-btn[data-group="callType"].active');
+  const cdBtn = document.querySelector('.cb-btn[data-group="direction"].active');
+  const trBtn = document.querySelector('.cb-btn[data-group="transport"].active');
+  return {
+    name: document.getElementById('cbName').value.trim(),
+    callType: ctBtn ? ctBtn.dataset.value : 'internal',
+    direction: cdBtn ? cdBtn.dataset.value : 'outbound',
+    transport: trBtn ? trBtn.dataset.value : 'udp',
+    numPbx: Number(document.getElementById('cbPbxCount').value),
+    firewall: {
+      enabled: document.getElementById('cbFirewallEnabled').checked,
+      position: document.getElementById('cbFirewallPosition').value,
+      behavior: document.getElementById('cbFirewallBehavior').value
+    },
+    codec: document.getElementById('cbCodec').value,
+    outcome: document.getElementById('cbOutcome').value
+  };
+}
+function updateCbPreview(){
+  const params = getCbParams();
+  const endpoints = buildCustomTopology(params);
+  const chain = endpoints.map(id => (ENDPOINTS[id]&&ENDPOINTS[id].icon?ENDPOINTS[id].icon+' ':'') + ((ENDPOINTS[id]&&ENDPOINTS[id].label)||id)).join('  →  ');
+  const outcomeSelect = document.getElementById('cbOutcome');
+  const outcomeText = outcomeSelect.options[outcomeSelect.selectedIndex].textContent;
+  const preview = document.getElementById('cbPreview');
+  preview.innerHTML = '<div class="cw">Preview</div>' + chain +
+    '<br><span style="color:var(--muted);font-size:11px;">' + outcomeText + ' · ' + params.direction + ' · ' + params.transport.toUpperCase() + '</span>';
+}
+function openCustomBuilder(){
+  document.getElementById('mainView').style.display = 'none';
+  document.getElementById('customBuilderView').style.display = 'block';
+  updateCbPreview();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function closeCustomBuilder(){
+  document.getElementById('customBuilderView').style.display = 'none';
+  document.getElementById('mainView').style.display = 'block';
+}
 function init(){
   applyTheme();
   populateCodeSelect();
@@ -3057,6 +3644,8 @@ function init(){
   buildScenarioSelect();
   buildSpeedGroup();
   buildCallTypeUI();
+  buildCallDirectionUI();
+  buildTransportUI();
   updateSelMeta();
   codePicker.style.display = (SCENARIOS[scenarioKey].isExplorer && !SCENARIOS[scenarioKey].isSdpExplorer) ? 'block' : 'none';
   sdpPicker.style.display = SCENARIOS[scenarioKey].isSdpExplorer ? 'block' : 'none';
@@ -3089,6 +3678,28 @@ function init(){
   Array.from(document.querySelectorAll('.ct-btn')).forEach(btn=>{
     btn.onclick = ()=> setCallType(btn.dataset.type);
   });
+  Array.from(document.querySelectorAll('.cd-btn')).forEach(btn=>{
+    btn.onclick = ()=> setCallDirection(btn.dataset.dir);
+  });
+  Array.from(document.querySelectorAll('.tr-btn')).forEach(btn=>{
+    btn.onclick = ()=> setTransport(btn.dataset.transport);
+  });
+  scenarioSearch.addEventListener('input', ()=> renderSearchResults(scenarioSearch.value));
+  scenarioSearch.addEventListener('focus', ()=>{ if(scenarioSearch.value.trim()) renderSearchResults(scenarioSearch.value); });
+  scenarioSearch.addEventListener('blur', ()=>{ setTimeout(()=>{ searchResults.style.display='none'; }, 150); });
+  scenarioSearch.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape'){ scenarioSearch.value=''; searchResults.style.display='none'; scenarioSearch.blur(); }
+    else if(e.key==='Enter'){
+      const results = runSearch(scenarioSearch.value);
+      if(results.length){
+        switchScenario(results[0].key);
+        scenarioSearch.value = '';
+        searchResults.style.display = 'none';
+      }
+      e.preventDefault();
+    }
+  });
+  resetAllBtn.onclick = resetAllOptions;
   Array.from(inspTabs.querySelectorAll('.itab')).forEach(btn=>{
     btn.onclick = ()=>{ activeTab = btn.dataset.tab; renderActiveTab(); };
   });
@@ -3097,6 +3708,33 @@ function init(){
   makeVerticalResizer(document.getElementById('resizeInspector'), inspBody, {min:160});
   makeVerticalResizer(document.getElementById('resizeLog'), logBody, {min:100});
   makeColumnSplitter(document.getElementById('colSplitter'), document.getElementById('mainGrid'));
+
+  /* ---------- Custom builder wiring ---------- */
+  document.getElementById('openBuilderBtn').onclick = openCustomBuilder;
+  document.getElementById('cbBackBtn').onclick = closeCustomBuilder;
+  document.getElementById('cbFirewallEnabled').onchange = (e)=>{
+    document.getElementById('cbFirewallOptions').style.display = e.target.checked ? 'block' : 'none';
+    updateCbPreview();
+  };
+  ['cbPbxCount','cbFirewallPosition','cbFirewallBehavior','cbCodec','cbOutcome'].forEach(id=>{
+    document.getElementById(id).onchange = updateCbPreview;
+  });
+  document.getElementById('cbName').addEventListener('input', updateCbPreview);
+  Array.from(document.querySelectorAll('.cb-btn')).forEach(btn=>{
+    btn.onclick = ()=>{
+      const group = btn.dataset.group;
+      Array.from(document.querySelectorAll('.cb-btn[data-group="'+group+'"]')).forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      updateCbPreview();
+    };
+  });
+  document.getElementById('cbRunBtn').onclick = ()=>{
+    const params = getCbParams();
+    runCustomBuilder(params);
+    switchScenario('custom');
+    closeCustomBuilder();
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
 }
 init();
 </script>
